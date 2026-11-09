@@ -1,672 +1,470 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#ea580c">
-<meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="manifest" href="manifest.json">
-<title>Smart Bakery & Cake OS</title>
-<style>
-:root{
-  --bg:#f6f4f1; --card:#fff; --ink:#1f2937; --mute:#6b7280; --line:#ece8e3;
-  --brand:#ea580c; --brand2:#f97316; --brandSoft:#fff1e8;
-  --green:#059669; --greenSoft:#e7f8f1; --red:#dc2626; --redSoft:#fdecec;
-  --amber:#d97706; --amberSoft:#fff6e0; --blue:#2563eb; --blueSoft:#e8f0ff;
-  --r:18px; --shadow:0 1px 3px rgba(0,0,0,.06),0 6px 18px rgba(0,0,0,.04);
-}
-@media (prefers-color-scheme:dark){
-  :root{--bg:#141210; --card:#1f1c19; --ink:#f3efe9; --mute:#a39b92; --line:#332e29;
-  --brandSoft:#3a2315; --greenSoft:#12332a; --redSoft:#3a1b1b; --amberSoft:#3a2d12; --blueSoft:#172640;--shadow:none}
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Bengali",sans-serif;background:var(--bg);color:var(--ink);font-size:15px;-webkit-font-smoothing:antialiased}
-button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
-input,select,textarea{font:inherit;color:var(--ink)}
-.app{max-width:760px;margin:0 auto;min-height:100%;padding-bottom:calc(92px + env(safe-area-inset-bottom))}
-header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);padding:calc(12px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.logo{display:flex;align-items:center;gap:10px;min-width:0}
-.logo .ic{width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,var(--brand2),var(--brand));display:grid;place-items:center;font-size:21px;box-shadow:0 6px 14px rgba(234,88,12,.3);flex:none}
-.logo h1{font-size:16px;margin:0;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.logo small{color:var(--mute);font-size:12px}
-.iconbtn{width:40px;height:40px;border-radius:12px;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center;font-size:18px;flex:none}
-main{padding:4px 16px}
-.tab{display:none;animation:fade .25s ease}.tab.on{display:block}
-@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-h2{font-size:20px;margin:6px 0 2px}
-.sub{color:var(--mute);font-size:13px;margin:0 0 12px}
-.card{background:var(--card);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);border:1px solid var(--line)}
-.stack{display:grid;gap:10px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
-.monthbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.monthbar b{font-size:17px}
-.stat{border-radius:var(--r);padding:14px;color:#fff;position:relative;overflow:hidden}
-.stat .v{font-size:23px;font-weight:800;margin-top:4px;word-break:break-all}
-.stat .t{font-size:12px;opacity:.9}
-.stat .em{position:absolute;right:-6px;bottom:-12px;font-size:56px;opacity:.15}
-.s-rev{background:linear-gradient(135deg,#fb923c,#ea580c)}
-.s-pro{background:linear-gradient(135deg,#10b981,#0d9488)}
-.s-pro.neg{background:linear-gradient(135deg,#ef4444,#b91c1c)}
-.mini .v{font-size:20px;font-weight:800;margin-top:2px}
-.mini .t{font-size:12px;color:var(--mute);display:flex;justify-content:space-between}
-.sec{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 8px}
-.link{color:var(--brand);font-weight:700;font-size:13px}
-.qa{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.qa button{padding:12px 6px;border-radius:14px;font-weight:700;font-size:12.5px;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .1s}
-.qa button:active{transform:scale(.95)}
-.qa span{font-size:20px}
-.item{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px;box-shadow:var(--shadow)}
-.item h4{margin:0;font-size:15px}
-.item p{margin:2px 0 0;color:var(--mute);font-size:12.5px}
-.badge{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px;display:inline-block;vertical-align:middle;margin-left:6px}
-.b-Pending{background:var(--amberSoft);color:var(--amber)}
-.b-Confirmed{background:var(--blueSoft);color:var(--blue)}
-.b-Delivered{background:var(--greenSoft);color:var(--green)}
-.b-Cancelled{background:var(--redSoft);color:var(--red)}
-.money{font-weight:800}
-.due{color:var(--amber)}.ok{color:var(--green)}.bad{color:var(--red)}
-.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
-.btn{padding:8px 12px;border-radius:11px;font-weight:600;font-size:12.5px;background:var(--bg);border:1px solid var(--line)}
-.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}
-.btn.g{background:var(--greenSoft);color:var(--green);border-color:transparent}
-.btn.r{background:var(--redSoft);color:var(--red);border-color:transparent}
-.btn:active{transform:scale(.96)}
-.seg{display:inline-flex;background:var(--line);border-radius:12px;padding:3px}
-.seg button{padding:6px 12px;border-radius:9px;font-size:12.5px;font-weight:600;color:var(--mute)}
-.seg button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
-.search{width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--card);margin:6px 0 10px}
-.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
-.chip{flex:none;padding:6px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-size:12.5px;font-weight:600;color:var(--mute)}
-.chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
-.empty{text-align:center;color:var(--mute);padding:28px 14px;font-size:13.5px}
-.empty b{display:block;font-size:30px;margin-bottom:6px}
-/* chart */
-.chart{display:flex;align-items:flex-end;gap:8px;height:120px;margin-top:12px}
-.col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
-.bars{display:flex;align-items:flex-end;gap:3px;height:100%;width:100%;justify-content:center}
-.bar{width:42%;max-width:20px;border-radius:5px 5px 0 0;min-height:2px;transition:height .4s}
-.bar.rv{background:var(--brand2)}.bar.ex{background:#94a3b8}
-.col small{font-size:10.5px;color:var(--mute)}
-.legend{display:flex;gap:14px;font-size:11.5px;color:var(--mute);margin-top:4px}
-.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px}
-.meter{height:8px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:5px}
-.meter div{height:100%;background:var(--brand2);border-radius:9px}
-/* nav */
-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
-nav .in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 70px 1fr 1fr;align-items:center}
-nav button.t{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;color:var(--mute);font-size:10.5px;font-weight:600}
-nav button.t span{font-size:20px;filter:grayscale(1);opacity:.7}
-nav button.t.on{color:var(--brand)}nav button.t.on span{filter:none;opacity:1}
-.fab{width:56px;height:56px;margin:-26px auto 0;border-radius:50%;background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;font-size:28px;box-shadow:0 8px 20px rgba(234,88,12,.45);display:grid;place-items:center;transition:transform .15s}
-.fab:active{transform:scale(.9)}
-/* sheet */
-.ov{position:fixed;inset:0;background:rgba(15,10,5,.5);z-index:50;display:none;align-items:flex-end;justify-content:center}
-.ov.on{display:flex}
-.sheet{background:var(--card);width:100%;max-width:560px;max-height:93vh;overflow-y:auto;border-radius:24px 24px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom));animation:up .25s ease}
-@media(min-width:700px){.ov{align-items:center}.sheet{border-radius:24px}}
-@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
-.sheet h3{margin:0;font-size:17px}
-.sh-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.x{width:34px;height:34px;border-radius:50%;background:var(--bg);font-size:15px}
-label{display:block;font-size:12px;font-weight:700;color:var(--mute);margin:10px 0 4px}
-input,select,textarea{width:100%;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);outline:none;font-size:16px}
-input:focus,select:focus,textarea:focus{border-color:var(--brand2);background:var(--card)}
-.calc{background:var(--brandSoft);border-radius:14px;padding:12px;margin-top:12px;display:grid;gap:6px;font-size:14px}
-.calc .row b{font-size:15px}
-.calc .big{font-size:19px;font-weight:800;color:var(--brand)}
-.step{display:flex;gap:6px}
-.step button{flex:none;width:44px;border-radius:12px;background:var(--bg);border:1.5px solid var(--line);font-size:20px;font-weight:700}
-.quick{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
-.quick button{padding:5px 11px;border-radius:99px;background:var(--bg);border:1px solid var(--line);font-size:12.5px;font-weight:600}
-.submit{width:100%;margin-top:16px;padding:14px;border-radius:14px;background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;font-weight:800;font-size:15px;box-shadow:0 6px 16px rgba(234,88,12,.3)}
-.ing{display:grid;grid-template-columns:1fr 100px 40px;gap:6px;margin-top:6px}
-.ing button{border-radius:12px;background:var(--redSoft);color:var(--red)}
-#toast{position:fixed;top:calc(14px + env(safe-area-inset-top));left:50%;transform:translate(-50%,-90px);background:#111;color:#fff;padding:10px 16px;border-radius:14px;font-size:13px;font-weight:600;z-index:99;transition:transform .3s;max-width:90%}
-#toast.on{transform:translate(-50%,0)}
-.hint{font-size:12px;color:var(--mute);margin:4px 0 0}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BakeFlow - Smart Bakery & Cake Order Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ea580c',
+                        darkBg: '#0f172a',
+                        cardBg: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Alpine.js CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body>
-<div class="app">
-  <header>
-    <div class="logo"><div class="ic">🎂</div><div><h1 id="biz">Smart Bakery & Cake OS</h1><small id="today"></small></div></div>
-    <button class="iconbtn" onclick="openSettings()" aria-label="Settings">⚙️</button>
-  </header>
+<body x-data="bakeFlowApp()" :class="darkMode ? 'dark bg-darkBg text-slate-100' : 'bg-slate-50 text-slate-800'" class="min-h-screen transition-colors duration-300">
 
-  <main>
-    <!-- DASHBOARD -->
-    <section id="tab-home" class="tab on">
-      <div class="monthbar">
-        <button class="iconbtn" onclick="shiftMonth(-1)" aria-label="Previous month">‹</button>
-        <b id="monthTitle"></b>
-        <button class="iconbtn" onclick="shiftMonth(1)" aria-label="Next month">›</button>
-      </div>
-      <div class="grid2">
-        <div class="stat s-rev"><div class="t">Sales (Revenue)</div><div class="v" id="sRev"></div><div class="t" id="sRevSub"></div><div class="em">💰</div></div>
-        <div class="stat s-pro" id="proCard"><div class="t">Net Profit</div><div class="v" id="sPro"></div><div class="t">Sales − Cost − Expenses</div><div class="em">📈</div></div>
-      </div>
-      <div class="grid2" style="margin-top:10px">
-        <div class="card mini"><div class="t">Orders <span>🛍️</span></div><div class="v" id="sOrd"></div></div>
-        <div class="card mini"><div class="t">Pending Dues <span>⏳</span></div><div class="v due" id="sDue"></div></div>
-        <div class="card mini"><div class="t">Collected <span>✅</span></div><div class="v ok" id="sCol"></div></div>
-        <div class="card mini"><div class="t">Expenses <span>🧾</span></div><div class="v bad" id="sExp"></div></div>
-      </div>
+    <!-- Top Navigation / Header -->
+    <header class="sticky top-0 z-40 bg-white dark:bg-cardBg shadow-sm border-b border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <!-- Hamburger Menu Button -->
+            <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                <i data-lucide="menu" class="w-6 h-6 text-primary"></i>
+            </button>
+            <div class="flex items-center space-x-2">
+                <div class="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-bold text-lg">🍰</div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">BakeFlow</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Pro Bakery OS</p>
+                </div>
+            </div>
+        </div>
 
-      <div class="sec"><span class="lbl">Quick actions</span></div>
-      <div class="qa">
-        <button style="background:var(--brandSoft);color:var(--brand)" onclick="openOrder()"><span>🎂</span>New Order</button>
-        <button style="background:var(--blueSoft);color:var(--blue)" onclick="openExpense()"><span>🛒</span>Add Bazar</button>
-        <button style="background:var(--amberSoft);color:var(--amber)" onclick="showDues()"><span>💸</span>View Dues</button>
-      </div>
+        <div class="flex items-center space-x-2">
+            <!-- Dark/Light Mode Toggle -->
+            <button @click="toggleDarkMode()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                <i :data-lucide="darkMode ? 'sun' : 'moon'" class="w-5 h-5 text-amber-500"></i>
+            </button>
+        </div>
+    </header>
 
-      <div class="sec"><span class="lbl">Upcoming deliveries (7 days)</span></div>
-      <div id="upcoming" class="stack"></div>
+    <!-- Sidebar Drawer -->
+    <div x-show="sidebarOpen" class="fixed inset-0 z-50 flex">
+        <!-- Backdrop -->
+        <div @click="sidebarOpen = false" class="fixed inset-0 bg-black/50 transition-opacity"></div>
+        
+        <!-- Sidebar Content -->
+        <div class="relative w-72 bg-white dark:bg-cardBg h-full shadow-2xl flex flex-col z-10 p-5 space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🧁</span>
+                    <span class="font-bold text-xl">BakeFlow Menu</span>
+                </div>
+                <button @click="sidebarOpen = false" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
 
-      <div class="sec"><span class="lbl">Last 6 months</span></div>
-      <div class="card">
-        <div class="chart" id="chart"></div>
-        <div class="legend"><span><i style="background:var(--brand2)"></i>Sales</span><span><i style="background:#94a3b8"></i>Expenses</span></div>
-      </div>
+            <nav class="space-y-2 flex-1 overflow-y-auto">
+                <button @click="currentTab = 'dashboard'; sidebarOpen = false" :class="currentTab === 'dashboard' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button @click="currentTab = 'orders'; sidebarOpen = false" :class="currentTab === 'orders' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                    <span>Orders & POS</span>
+                </button>
+                <button @click="currentTab = 'customers'; sidebarOpen = false" :class="currentTab === 'customers' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <span>Customer History</span>
+                </button>
+                <button @click="currentTab = 'calendar'; sidebarOpen = false" :class="currentTab === 'calendar' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                    <i data-lucide="calendar" class="w-5 h-5"></i>
+                    <span>Delivery Calendar</span>
+                </button>
+                <button @click="currentTab = 'expenses'; sidebarOpen = false" :class="currentTab === 'expenses' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                    <i data-lucide="receipt" class="w-5 h-5"></i>
+                    <span>Expenses & Costs</span>
+                </button>
+                <button @click="currentTab = 'backup'; sidebarOpen = false" :class="currentTab === 'backup' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                    <i data-lucide="database" class="w-5 h-5"></i>
+                    <span>Backup & Restore</span>
+                </button>
+            </nav>
 
-      <div class="sec"><span class="lbl">Top flavours this month</span></div>
-      <div class="card" id="topFlavours"></div>
-    </section>
-
-    <!-- ORDERS -->
-    <section id="tab-orders" class="tab">
-      <div class="row"><div><h2>Orders & Sales</h2><p class="sub">Cake orders for the selected month</p></div>
-        <button class="btn p" onclick="openOrder()">＋ New</button></div>
-      <div class="monthbar" style="margin:0 0 6px">
-        <button class="iconbtn" onclick="shiftMonth(-1)">‹</button><b class="mt"></b><button class="iconbtn" onclick="shiftMonth(1)">›</button>
-      </div>
-      <input class="search" id="q" placeholder="🔍 Search name, phone or cake…" oninput="renderOrders()">
-      <div class="chips" id="ofilters"></div>
-      <div id="orderList" class="stack"></div>
-    </section>
-
-    <!-- EXPENSES -->
-    <section id="tab-exp" class="tab">
-      <div class="row"><div><h2>Bazar & Expenses</h2><p class="sub">Ingredients, gas, rent, packaging…</p></div>
-        <button class="btn p" onclick="openExpense()">＋ Add</button></div>
-      <div class="monthbar" style="margin:0 0 10px">
-        <button class="iconbtn" onclick="shiftMonth(-1)">‹</button><b class="mt"></b><button class="iconbtn" onclick="shiftMonth(1)">›</button>
-      </div>
-      <div class="card row"><div><div class="lbl">Total this month</div><div class="money bad" style="font-size:24px" id="expTotal"></div></div><div style="font-size:34px">🛒</div></div>
-      <div class="sec"><span class="lbl">By category</span></div>
-      <div class="card" id="expCats"></div>
-      <div class="sec"><span class="lbl">Entries</span></div>
-      <div class="chips" id="efilters"></div>
-      <div id="expList" class="stack"></div>
-    </section>
-
-    <!-- RECIPES -->
-    <section id="tab-menu" class="tab">
-      <div class="row"><div><h2>Recipes & Pricing</h2><p class="sub">Cost per lb, margin and selling price</p></div>
-        <button class="btn p" onclick="openRecipe()">＋ Add</button></div>
-      <div id="menuList" class="stack"></div>
-    </section>
-  </main>
-</div>
-
-<nav><div class="in">
-  <button class="t on" data-tab="home" onclick="tab('home')"><span>🏠</span>Home</button>
-  <button class="t" data-tab="orders" onclick="tab('orders')"><span>🎂</span>Orders</button>
-  <button class="fab" onclick="openOrder()" aria-label="New order">＋</button>
-  <button class="t" data-tab="exp" onclick="tab('exp')"><span>🧾</span>Expenses</button>
-  <button class="t" data-tab="menu" onclick="tab('menu')"><span>📖</span>Recipes</button>
-</div></nav>
-
-<!-- ORDER SHEET -->
-<div class="ov" id="ov-order" onclick="if(event.target===this)closeSheet('order')"><div class="sheet">
-  <div class="sh-h"><h3 id="orderTitle">New Cake Order</h3><button class="x" onclick="closeSheet('order')">✕</button></div>
-  <form id="oform" onsubmit="saveOrder(event)" autocomplete="off">
-    <input type="hidden" id="o-id">
-    <div class="grid2">
-      <div><label>Customer name *</label><input id="o-name" required placeholder="Rahat Ahmed"></div>
-      <div><label>Phone *</label><input id="o-phone" type="tel" inputmode="tel" required placeholder="017XXXXXXXX"></div>
+            <div class="border-t border-slate-200 dark:border-slate-700 pt-4 text-xs text-center text-slate-500">
+                BakeFlow v2.5 • PWA Ready
+            </div>
+        </div>
     </div>
-    <label>Cake (from menu)</label>
-    <select id="o-recipe" onchange="pickRecipe()"></select>
-    <label>Cake name / flavour *</label>
-    <input id="o-cake" required placeholder="Chocolate Fudge">
-    <div class="grid2">
-      <div><label>Weight (lb) *</label>
-        <div class="step"><button type="button" onclick="stepW(-.5)">−</button><input id="o-weight" type="number" step="0.5" min="0.5" inputmode="decimal" required value="1" oninput="calc()"><button type="button" onclick="stepW(.5)">＋</button></div>
-      </div>
-      <div><label>Price per lb (৳) *</label><input id="o-rate" type="number" min="0" inputmode="numeric" required oninput="calc()"></div>
-    </div>
-    <div class="quick" id="wquick"><button type="button" onclick="setW(1)">1 lb</button><button type="button" onclick="setW(2)">2 lb</button><button type="button" onclick="setW(3)">3 lb</button><button type="button" onclick="setW(5)">5 lb</button></div>
-    <div class="grid2">
-      <div><label>Extra (design/delivery) ৳</label><input id="o-extra" type="number" min="0" value="0" inputmode="numeric" oninput="calc()"></div>
-      <div><label>Discount ৳</label><input id="o-disc" type="number" min="0" value="0" inputmode="numeric" oninput="calc()"></div>
-    </div>
-    <div class="grid2">
-      <div><label>Advance / paid ৳</label><input id="o-paid" type="number" min="0" value="0" inputmode="numeric" oninput="calc()"></div>
-      <div><label>Est. cost per lb ৳</label><input id="o-cost" type="number" min="0" value="0" inputmode="numeric" oninput="calc()"></div>
-    </div>
-    <div class="quick"><button type="button" onclick="payPct(.5)">50% advance</button><button type="button" onclick="payPct(1)">Full payment</button><button type="button" onclick="payPct(0)">No advance</button></div>
-    <div class="calc">
-      <div class="row"><span>Total price</span><span class="big" id="c-total">৳0</span></div>
-      <div class="row"><span>Balance due</span><b id="c-due">৳0</b></div>
-      <div class="row"><span>Est. ingredient cost</span><b id="c-cost">৳0</b></div>
-      <div class="row"><span>Est. profit on this cake</span><b id="c-profit">৳0</b></div>
-    </div>
-    <div class="grid2">
-      <div><label>Delivery date *</label><input id="o-date" type="date" required></div>
-      <div><label>Status</label><select id="o-status"><option>Pending</option><option>Confirmed</option><option>Delivered</option><option>Cancelled</option></select></div>
-    </div>
-    <label>Notes / writing on cake</label>
-    <textarea id="o-notes" rows="2" placeholder="Happy Birthday Rahat"></textarea>
-    <button class="submit" type="submit">Save Order</button>
-  </form>
-</div></div>
 
-<!-- COLLECT PAYMENT SHEET -->
-<div class="ov" id="ov-pay" onclick="if(event.target===this)closeSheet('pay')"><div class="sheet">
-  <div class="sh-h"><h3>Collect Payment</h3><button class="x" onclick="closeSheet('pay')">✕</button></div>
-  <p id="payInfo" class="sub"></p>
-  <form onsubmit="savePay(event)">
-    <input type="hidden" id="p-id">
-    <label>Amount received ৳</label><input id="p-amt" type="number" min="1" inputmode="numeric" required>
-    <button class="submit" type="submit">Record Payment</button>
-  </form>
-</div></div>
+    <!-- Main Content Area -->
+    <main class="max-w-6xl mx-auto p-4 md:p-6 pb-24">
 
-<!-- EXPENSE SHEET -->
-<div class="ov" id="ov-exp" onclick="if(event.target===this)closeSheet('exp')"><div class="sheet">
-  <div class="sh-h"><h3 id="expTitle">Add Bazar / Expense</h3><button class="x" onclick="closeSheet('exp')">✕</button></div>
-  <form onsubmit="saveExpense(event)" autocomplete="off">
-    <input type="hidden" id="e-id">
-    <label>Category</label><select id="e-cat"></select>
-    <label>Description *</label><input id="e-title" required placeholder="Flour & butter bazar">
-    <div class="grid2">
-      <div><label>Amount ৳ *</label><input id="e-amt" type="number" min="0" inputmode="numeric" required></div>
-      <div><label>Date *</label><input id="e-date" type="date" required></div>
-    </div>
-    <button class="submit" type="submit">Save Expense</button>
-  </form>
-</div></div>
+        <!-- 1. DASHBOARD TAB -->
+        <div x-show="currentTab === 'dashboard'" class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-slate-500">Total Orders</span>
+                        <span class="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-xl"><i data-lucide="shopping-cart" class="w-5 h-5"></i></span>
+                    </div>
+                    <h2 class="text-2xl font-bold mt-2" x-text="orders.length">0</h2>
+                </div>
+                <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-slate-500">Total Sales</span>
+                        <span class="p-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 rounded-xl"><i data-lucide="dollar-sign" class="w-5 h-5"></i></span>
+                    </div>
+                    <h2 class="text-2xl font-bold mt-2" x-text="'৳ ' + totalSales">0</h2>
+                </div>
+                <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-slate-500">Estimated Profit</span>
+                        <span class="p-2 bg-amber-50 dark:bg-amber-900/30 text-amber-500 rounded-xl"><i data-lucide="trending-up" class="w-5 h-5"></i></span>
+                    </div>
+                    <h2 class="text-2xl font-bold mt-2" x-text="'৳ ' + totalProfit">0</h2>
+                </div>
+                <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-slate-500">Due / Receivable</span>
+                        <span class="p-2 bg-rose-50 dark:bg-rose-900/30 text-rose-500 rounded-xl"><i data-lucide="alert-circle" class="w-5 h-5"></i></span>
+                    </div>
+                    <h2 class="text-2xl font-bold mt-2" x-text="'৳ ' + totalDue">0</h2>
+                </div>
+            </div>
 
-<!-- RECIPE SHEET -->
-<div class="ov" id="ov-rec" onclick="if(event.target===this)closeSheet('rec')"><div class="sheet">
-  <div class="sh-h"><h3 id="recTitle">Add Menu Item</h3><button class="x" onclick="closeSheet('rec')">✕</button></div>
-  <form onsubmit="saveRecipe(event)" autocomplete="off">
-    <input type="hidden" id="r-id">
-    <label>Cake name *</label><input id="r-name" required placeholder="Red Velvet">
-    <label>Ingredients for one batch (optional costing)</label>
-    <div id="r-ings"></div>
-    <button type="button" class="btn" style="margin-top:8px" onclick="addIng()">＋ Ingredient</button>
-    <div class="grid2">
-      <div><label>Batch yield (lb)</label><input id="r-yield" type="number" min="0.5" step="0.5" value="1" inputmode="decimal" oninput="recCalc()"></div>
-      <div><label>Cost per lb ৳ *</label><input id="r-cost" type="number" min="0" required inputmode="numeric" oninput="recCalc(true)"></div>
-    </div>
-    <p class="hint" id="r-hint">Add ingredient costs and the cost per lb is calculated for you.</p>
-    <div class="grid2">
-      <div><label>Target margin %</label><input id="r-margin" type="number" min="0" max="500" inputmode="numeric" oninput="recCalc()"></div>
-      <div><label>Selling price / lb ৳ *</label><input id="r-price" type="number" min="0" required inputmode="numeric" oninput="recCalc(false,true)"></div>
-    </div>
-    <div class="quick"><button type="button" onclick="applySuggest()">Use suggested price</button></div>
-    <div class="calc">
-      <div class="row"><span>Suggested price (cost + margin)</span><b id="r-sugg">৳0</b></div>
-      <div class="row"><span>Profit per lb</span><b id="r-profit">৳0</b></div>
-      <div class="row"><span>Actual margin</span><b id="r-actual">0%</b></div>
-    </div>
-    <button class="submit" type="submit">Save Menu Item</button>
-  </form>
-</div></div>
+            <!-- Quick Actions -->
+            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-bold">Quick New Order</h3>
+                    <p class="text-sm text-slate-500">Create a new cake order instantly and send WhatsApp invoice.</p>
+                </div>
+                <button @click="currentTab = 'orders'" class="px-5 py-2.5 bg-primary text-white font-medium rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition flex items-center space-x-2">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <span>New Order Form</span>
+                </button>
+            </div>
+        </div>
 
-<!-- SETTINGS SHEET -->
-<div class="ov" id="ov-set" onclick="if(event.target===this)closeSheet('set')"><div class="sheet">
-  <div class="sh-h"><h3>Settings</h3><button class="x" onclick="closeSheet('set')">✕</button></div>
-  <label>Business name</label><input id="s-biz">
-  <label>Default profit margin %</label><input id="s-margin" type="number" min="0" inputmode="numeric">
-  <button class="submit" onclick="saveSettings()">Save Settings</button>
-  <div class="sec"><span class="lbl">Backup & data</span></div>
-  <div class="actions" style="border:0;margin:0;padding:0">
-    <button class="btn g" onclick="exportData()">⬇ Export backup</button>
-    <button class="btn" onclick="document.getElementById('importFile').click()">⬆ Import backup</button>
-    <button class="btn r" onclick="resetAll()">Reset all data</button>
-  </div>
-  <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)">
-  <p class="hint">Everything is saved on this device (browser storage). Export a backup now and then, especially before clearing browser data.</p>
-</div></div>
+        <!-- 2. ORDERS & POS TAB -->
+        <div x-show="currentTab === 'orders'" class="space-y-6">
+            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                <h3 class="text-xl font-bold mb-4 flex items-center space-x-2">
+                    <i data-lucide="plus-circle" class="text-primary"></i>
+                    <span>Create New Cake Order</span>
+                </h3>
 
-<div id="toast"></div>
+                <form @submit.prevent="addOrder" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Customer Name</label>
+                        <input type="text" x-model="newOrder.customerName" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="e.g. Rahim Ahmed">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Phone Number (WhatsApp)</label>
+                        <input type="text" x-model="newOrder.phone" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="018XXXXXXXX">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Cake Flavor / Item</label>
+                        <input type="text" x-model="newOrder.item" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="Chocolate Truffle 1.5kg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Total Amount (৳)</label>
+                        <input type="number" x-model.number="newOrder.total" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="1200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Advance Paid (৳)</label>
+                        <input type="number" x-model.number="newOrder.advance" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Estimated Cost (৳)</label>
+                        <input type="number" x-model.number="newOrder.cost" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Delivery Date</label>
+                        <input type="date" x-model="newOrder.deliveryDate" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary">
+                    </div>
+                    <div class="md:col-span-2 lg:col-span-3 flex justify-end mt-2">
+                        <button type="submit" class="px-6 py-3 bg-primary text-white font-medium rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition flex items-center space-x-2">
+                            <i data-lucide="check" class="w-5 h-5"></i>
+                            <span>Save Order & Send WhatsApp Invoice</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
 
-<script>
-/* ---------- helpers ---------- */
-const $ = id => document.getElementById(id);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const pad = n => String(n).padStart(2,'0');
-const todayStr = () => { const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
-const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
-const fmt = n => '৳' + Math.round(n).toLocaleString('en-IN');
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const SHORT = MONTHS.map(m => m.slice(0,3));
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
-const CATS = ['Ingredients','Packaging','Gas & Electricity','Rent','Salary / Labour','Delivery','Marketing','Other'];
-const CAT_ICON = {'Ingredients':'🥚','Packaging':'📦','Gas & Electricity':'🔥','Rent':'🏠','Salary / Labour':'👩‍🍳','Delivery':'🛵','Marketing':'📣','Other':'🧾'};
+            <!-- Orders List Table -->
+            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                <h3 class="text-xl font-bold mb-4">All Orders History</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 dark:border-slate-700 text-slate-400 text-sm">
+                                <th class="py-3 px-4">Customer</th>
+                                <th class="py-3 px-4">Cake Item</th>
+                                <th class="py-3 px-4">Total</th>
+                                <th class="py-3 px-4">Paid / Due</th>
+                                <th class="py-3 px-4">Delivery</th>
+                                <th class="py-3 px-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+                            <template x-for="order in orders" :key="order.id">
+                                <tr>
+                                    <td class="py-3 px-4 font-medium">
+                                        <div x-text="order.customerName"></div>
+                                        <div class="text-xs text-slate-400" x-text="order.phone"></div>
+                                    </td>
+                                    <td class="py-3 px-4" x-text="order.item"></td>
+                                    <td class="py-3 px-4" x-text="'৳ ' + order.total"></td>
+                                    <td class="py-3 px-4">
+                                        <span class="text-emerald-500" x-text="'Paid: ৳ ' + order.advance"></span><br>
+                                        <span class="text-rose-500 text-xs" x-text="'Due: ৳ ' + (order.total - order.advance)"></span>
+                                    </td>
+                                    <td class="py-3 px-4 text-xs" x-text="order.deliveryDate"></td>
+                                    <td class="py-3 px-4 text-center flex items-center justify-center space-x-2">
+                                        <button @click="sendWhatsApp(order)" title="Send WhatsApp Invoice" class="p-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 rounded-lg hover:bg-emerald-100 transition">
+                                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                        </button>
+                                        <button @click="printInvoice(order)" title="Print Cash Memo" class="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-lg hover:bg-blue-100 transition">
+                                            <i data-lucide="printer" class="w-4 h-4"></i>
+                                        </button>
+                                        <button @click="deleteOrder(order.id)" title="Delete" class="p-2 bg-rose-50 dark:bg-rose-900/30 text-rose-600 rounded-lg hover:bg-rose-100 transition">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template x-if="orders.length === 0">
+                                <tr>
+                                    <td colspan="6" class="py-8 text-center text-slate-400">No orders found yet. Create your first order above!</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-/* ---------- storage ---------- */
-const KEY = 'smart_bakery_cake_os_v2';
-const DEFAULTS = () => ({
-  settings:{biz:'Smart Bakery & Cake OS', margin:50},
-  orders:[], expenses:[],
-  menu:[
-    {id:uid()+'a',name:'Chocolate Fudge',price:1200,cost:600,margin:100,yield:1,ings:[]},
-    {id:uid()+'b',name:'Red Velvet',price:1300,cost:650,margin:100,yield:1,ings:[]},
-    {id:uid()+'c',name:'Vanilla Sponge',price:900,cost:400,margin:125,yield:1,ings:[]},
-    {id:uid()+'d',name:'Black Forest',price:1100,cost:500,margin:120,yield:1,ings:[]}
-  ]
-});
-let DB;
-function load(){
-  try{
-    const raw = localStorage.getItem(KEY);
-    DB = raw ? Object.assign(DEFAULTS(), JSON.parse(raw)) : DEFAULTS();
-  }catch(e){ DB = DEFAULTS(); }
-}
-function save(){
-  try{ localStorage.setItem(KEY, JSON.stringify(DB)); }
-  catch(e){ toast('⚠ Could not save (storage full or blocked)'); }
-}
-let toastT;
-function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),2400); }
+        <!-- 3. CUSTOMER HISTORY & SEARCH TAB -->
+        <div x-show="currentTab === 'customers'" class="space-y-6">
+            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                <h3 class="text-xl font-bold mb-4">Customer Database & Search</h3>
+                <div class="mb-4">
+                    <input type="text" x-model="searchQuery" placeholder="Search by customer name or phone number..." class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary">
+                </div>
+                <div class="space-y-3">
+                    <template x-for="order in filteredOrders" :key="order.id">
+                        <div class="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                            <div>
+                                <h4 class="font-bold text-base" x-text="order.customerName"></h4>
+                                <p class="text-xs text-slate-500" x-text="'Phone: ' + order.phone + ' • Ordered Item: ' + order.item"></p>
+                            </div>
+                            <div class="text-right">
+                                <span class="font-bold text-primary" x-text="'৳ ' + order.total"></span>
+                                <p class="text-xs text-slate-400" x-text="order.deliveryDate"></p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
 
-/* ---------- state ---------- */
-let ym = todayStr().slice(0,7);
-let ofilter = 'all', efilter = 'all';
-const inMonth = d => (d||'').slice(0,7) === ym;
-const orderTotal = o => Math.max(0, num(o.weight)*num(o.rate) + num(o.extra) - num(o.discount));
-const orderDue = o => o.status==='Cancelled' ? 0 : Math.max(0, orderTotal(o) - num(o.paid));
-const orderCost = o => num(o.weight)*num(o.costRate);
-const live = o => o.status !== 'Cancelled';
+        <!-- 4. DELIVERY CALENDAR TAB -->
+        <div x-show="currentTab === 'calendar'" class="space-y-6">
+            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                <h3 class="text-xl font-bold mb-4">Upcoming Cake Deliveries</h3>
+                <div class="space-y-3">
+                    <template x-for="order in orders" :key="order.id">
+                        <div class="p-4 rounded-xl border-l-4 border-primary bg-slate-50 dark:bg-slate-900 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold" x-text="order.item"></h4>
+                                <p class="text-xs text-slate-500" x-text="'Customer: ' + order.customerName + ' (' + order.phone + ')'"></p>
+                            </div>
+                            <div class="text-right">
+                                <span class="px-3 py-1 bg-primary/10 text-primary rounded-lg text-xs font-semibold" x-text="order.deliveryDate"></span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
 
-/* ---------- navigation ---------- */
-function tab(t){
-  document.querySelectorAll('.tab').forEach(s => s.classList.toggle('on', s.id === 'tab-'+t));
-  document.querySelectorAll('nav .t').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
-  window.scrollTo({top:0});
-  render();
-}
-function shiftMonth(d){
-  let [y,m] = ym.split('-').map(Number);
-  m += d; if(m>12){m=1;y++} if(m<1){m=12;y--}
-  ym = `${y}-${pad(m)}`; render();
-}
-function openSheet(n){ $('ov-'+n).classList.add('on'); document.body.style.overflow='hidden'; }
-function closeSheet(n){ $('ov-'+n).classList.remove('on'); if(!document.querySelector('.ov.on')) document.body.style.overflow=''; }
+        <!-- 5. EXPENSES TAB -->
+        <div x-show="currentTab === 'expenses'" class="space-y-6">
+            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                <h3 class="text-xl font-bold mb-4">Add Business Expense</h3>
+                <form @submit.prevent="addExpense" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Expense Title</label>
+                        <input type="text" x-model="newExpense.title" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" placeholder="e.g. Flour, Chocolate, Delivery">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Amount (৳)</label>
+                        <input type="number" x-model.number="newExpense.amount" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" placeholder="350">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full py-2.5 bg-slate-800 dark:bg-slate-700 text-white font-medium rounded-xl hover:bg-slate-700 transition">Add Expense</button>
+                    </div>
+                </form>
+            </div>
 
-/* ---------- render ---------- */
-function render(){
-  const [y,m] = ym.split('-').map(Number);
-  const title = `${MONTHS[m-1]} ${y}`;
-  $('monthTitle').textContent = title;
-  document.querySelectorAll('.mt').forEach(e => e.textContent = title);
-  $('biz').textContent = DB.settings.biz || 'Smart Bakery & Cake OS';
-  $('today').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short',year:'numeric'});
-  renderDashboard(); renderOrders(); renderExpenses(); renderMenu();
-}
+            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                <h3 class="text-xl font-bold mb-4">Expense Records</h3>
+                <div class="space-y-2">
+                    <template x-for="exp in expenses" :key="exp.id">
+                        <div class="flex justify-between items-center p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                            <span x-text="exp.title" class="font-medium"></span>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-rose-500 font-bold" x-text="'- ৳ ' + exp.amount"></span>
+                                <button @click="deleteExpense(exp.id)" class="text-slate-400 hover:text-rose-500"><i data-lucide="trash" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
 
-function monthStats(key){
-  const os = DB.orders.filter(o => (o.date||'').slice(0,7)===key && live(o));
-  const rev = os.reduce((a,o)=>a+orderTotal(o),0);
-  const cost = os.reduce((a,o)=>a+orderCost(o),0);
-  const paid = os.reduce((a,o)=>a+Math.min(num(o.paid),orderTotal(o)),0);
-  const exp = DB.expenses.filter(e => (e.date||'').slice(0,7)===key).reduce((a,e)=>a+num(e.amount),0);
-  return {os,rev,cost,paid,exp,due:rev-paid};
-}
+        <!-- 6. BACKUP & RESTORE TAB -->
+        <div x-show="currentTab === 'backup'" class="space-y-6">
+            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
+                <h3 class="text-xl font-bold">Data Backup & Restore</h3>
+                <p class="text-sm text-slate-500">Keep your bakery orders safe by exporting data as JSON file or restoring anytime.</p>
+                <div class="flex space-x-4">
+                    <button @click="exportData" class="px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition flex items-center space-x-2">
+                        <i data-lucide="download" class="w-5 h-5"></i>
+                        <span>Export Backup JSON</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-function renderDashboard(){
-  const s = monthStats(ym);
-  const profit = s.rev - s.cost - s.exp;
-  $('sRev').textContent = fmt(s.rev);
-  $('sRevSub').textContent = `Cake cost ${fmt(s.cost)}`;
-  $('sPro').textContent = fmt(profit);
-  $('proCard').classList.toggle('neg', profit < 0);
-  $('sOrd').textContent = s.os.length;
-  $('sDue').textContent = fmt(s.due);
-  $('sCol').textContent = fmt(s.paid);
-  $('sExp').textContent = fmt(s.exp);
+    </main>
 
-  // upcoming deliveries
-  const t = todayStr(); const end = new Date(); end.setDate(end.getDate()+7);
-  const endS = `${end.getFullYear()}-${pad(end.getMonth()+1)}-${pad(end.getDate())}`;
-  const up = DB.orders.filter(o => live(o) && o.status!=='Delivered' && o.date>=t && o.date<=endS).sort((a,b)=>a.date.localeCompare(b.date));
-  $('upcoming').innerHTML = up.length ? up.map(o=>`
-    <div class="item row" onclick="tab('orders')">
-      <div><h4>${esc(o.name)}<span class="badge b-${o.status}">${o.status}</span></h4><p>${esc(o.cake)} · ${o.weight} lb · ${o.date===t?'<b>Today</b>':o.date}</p></div>
-      <div style="text-align:right"><div class="money">${fmt(orderTotal(o))}</div><p class="${orderDue(o)?'due':'ok'}">${orderDue(o)?'Due '+fmt(orderDue(o)):'Paid'}</p></div>
-    </div>`).join('') : `<div class="card empty"><b>🍰</b>No deliveries in the next 7 days.</div>`;
+    <!-- App Logic Script -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('bakeFlowApp', () => ({
+                currentTab: 'dashboard',
+                sidebarOpen: false,
+                darkMode: true,
+                searchQuery: '',
+                orders: JSON.parse(localStorage.getItem('bakeflow_orders')) || [],
+                expenses: JSON.parse(localStorage.getItem('bakeflow_expenses')) || [],
+                
+                newOrder: { customerName: '', phone: '', item: '', total: '', advance: '', cost: '', deliveryDate: '' },
+                newExpense: { title: '', amount: '' },
 
-  // chart
-  const [y,m] = ym.split('-').map(Number); const data=[];
-  for(let i=5;i>=0;i--){ let mm=m-i, yy=y; while(mm<1){mm+=12;yy--} const k=`${yy}-${pad(mm)}`; const st=monthStats(k); data.push({l:SHORT[mm-1],rv:st.rev,ex:st.exp}); }
-  const mx = Math.max(1,...data.flatMap(d=>[d.rv,d.ex]));
-  $('chart').innerHTML = data.map(d=>`<div class="col"><div class="bars"><div class="bar rv" style="height:${d.rv/mx*100}%" title="${fmt(d.rv)}"></div><div class="bar ex" style="height:${d.ex/mx*100}%" title="${fmt(d.ex)}"></div></div><small>${d.l}</small></div>`).join('');
+                init() {
+                    setTimeout(() => lucide.createIcons(), 100);
+                },
 
-  // top flavours
-  const map = {};
-  s.os.forEach(o => { const k=o.cake.trim()||'Other'; map[k]=(map[k]||0)+orderTotal(o); });
-  const top = Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  const tmax = top.length ? top[0][1] : 1;
-  $('topFlavours').innerHTML = top.length ? top.map(([k,v])=>`<div style="margin-bottom:10px"><div class="row"><b>${esc(k)}</b><span class="money">${fmt(v)}</span></div><div class="meter"><div style="width:${v/tmax*100}%"></div></div></div>`).join('') : `<div class="empty" style="padding:8px">No sales yet this month.</div>`;
-}
+                toggleDarkMode() {
+                    this.darkMode = !this.darkMode;
+                },
 
-function showDues(){ ofilter='due'; tab('orders'); }
+                addOrder() {
+                    const order = { id: Date.now(), ...this.newOrder };
+                    this.orders.unshift(order);
+                    this.saveData();
 
-function renderOrders(){
-  const filters = [['all','All'],['due','Due'],['Pending','Pending'],['Confirmed','Confirmed'],['Delivered','Delivered'],['Cancelled','Cancelled']];
-  $('ofilters').innerHTML = filters.map(([k,l])=>`<button class="chip ${ofilter===k?'on':''}" onclick="ofilter='${k}';renderOrders()">${l}</button>`).join('');
-  const q = $('q').value.trim().toLowerCase();
-  const list = DB.orders.filter(o => inMonth(o.date)
-    && (!q || o.name.toLowerCase().includes(q) || o.phone.includes(q) || o.cake.toLowerCase().includes(q))
-    && (ofilter==='all' || (ofilter==='due' ? orderDue(o)>0 : o.status===ofilter)))
-    .sort((a,b)=>a.date.localeCompare(b.date));
-  $('orderList').innerHTML = list.length ? list.map(o=>{
-    const due = orderDue(o), tot = orderTotal(o);
-    return `<div class="item" style="${o.status==='Cancelled'?'opacity:.6':''}">
-      <div class="row" style="align-items:flex-start">
-        <div><h4>${esc(o.name)}<span class="badge b-${o.status}">${o.status}</span></h4>
-          <p>📞 <a href="tel:${esc(o.phone)}" style="color:var(--brand)">${esc(o.phone)}</a></p></div>
-        <div style="text-align:right"><div class="money" style="font-size:17px">${fmt(tot)}</div><p>Paid ${fmt(o.paid)}</p></div>
-      </div>
-      <div style="background:var(--bg);border-radius:12px;padding:9px 11px;margin-top:9px" class="row">
-        <div><b>${esc(o.cake)}</b> <span style="color:var(--mute)">· ${o.weight} lb</span>${o.notes?`<p style="font-style:italic">“${esc(o.notes)}”</p>`:''}</div>
-        <b class="${due?'due':'ok'}">${o.status==='Cancelled'?'—':(due?'Due '+fmt(due):'Fully paid')}</b>
-      </div>
-      <div class="row" style="margin-top:8px;font-size:12px;color:var(--mute)"><span>📅 ${o.date}</span><span>Profit ≈ ${fmt(tot-orderCost(o))}</span></div>
-      <div class="actions">
-        ${due>0?`<button class="btn g" onclick="openPay('${o.id}')">💵 Collect</button>`:''}
-        ${o.status!=='Delivered'&&o.status!=='Cancelled'?`<button class="btn" onclick="setStatus('${o.id}','Delivered')">✔ Delivered</button>`:''}
-        ${due>0?`<a class="btn" href="${waLink(o)}" target="_blank" rel="noopener">💬 Remind</a>`:''}
-        <button class="btn" onclick="openOrder('${o.id}')">✏️ Edit</button>
-        <button class="btn r" onclick="delOrder('${o.id}')">🗑</button>
-      </div></div>`;
-  }).join('') : `<div class="card empty"><b>🎂</b>No orders found for this month.<br>Tap ＋ to add one.</div>`;
-}
-function waLink(o){
-  let d = (o.phone||'').replace(/\D/g,''); if(d.startsWith('0')) d='88'+d; else if(!d.startsWith('880')&&d.length===10) d='880'+d;
-  const msg = `Assalamu alaikum ${o.name}, your ${o.cake} (${o.weight} lb) order for ${o.date} has a balance of ${fmt(orderDue(o))}. Thank you! – ${DB.settings.biz}`;
-  return `https://wa.me/${d}?text=${encodeURIComponent(msg)}`;
-}
-function setStatus(id,s){ const o=DB.orders.find(x=>x.id===id); if(o){o.status=s;save();render();toast('Marked '+s);} }
-function delOrder(id){ if(confirm('Delete this order?')){DB.orders=DB.orders.filter(o=>o.id!==id);save();render();toast('Order deleted');} }
+                    // Send WhatsApp message instantly regardless of payment state
+                    this.sendWhatsApp(order);
 
-function renderExpenses(){
-  const all = DB.expenses.filter(e=>inMonth(e.date));
-  const total = all.reduce((a,e)=>a+num(e.amount),0);
-  $('expTotal').textContent = fmt(total);
-  const by = {}; all.forEach(e=>by[e.cat]=(by[e.cat]||0)+num(e.amount));
-  const rows = Object.entries(by).sort((a,b)=>b[1]-a[1]);
-  $('expCats').innerHTML = rows.length ? rows.map(([k,v])=>`<div style="margin-bottom:10px"><div class="row"><span>${CAT_ICON[k]||'🧾'} ${esc(k)}</span><b>${fmt(v)} <span style="color:var(--mute);font-weight:500">(${Math.round(v/total*100)}%)</span></b></div><div class="meter"><div style="width:${v/total*100}%;background:var(--blue)"></div></div></div>`).join('') : `<div class="empty" style="padding:8px">No expenses yet.</div>`;
-  $('efilters').innerHTML = ['all',...CATS].map(k=>`<button class="chip ${efilter===k?'on':''}" onclick="efilter='${k}';renderExpenses()">${k==='all'?'All':esc(k)}</button>`).join('');
-  const list = all.filter(e=>efilter==='all'||e.cat===efilter).sort((a,b)=>b.date.localeCompare(a.date));
-  $('expList').innerHTML = list.length ? list.map(e=>`
-    <div class="item row"><div><h4>${CAT_ICON[e.cat]||'🧾'} ${esc(e.title)}</h4><p>${esc(e.cat)} · ${e.date}</p></div>
-      <div class="row" style="gap:6px"><b class="bad">−${fmt(e.amount)}</b>
-        <button class="btn" onclick="openExpense('${e.id}')">✏️</button><button class="btn r" onclick="delExpense('${e.id}')">🗑</button></div></div>`).join('')
-    : `<div class="card empty"><b>🛒</b>No entries.</div>`;
-}
-function delExpense(id){ if(confirm('Delete this expense?')){DB.expenses=DB.expenses.filter(e=>e.id!==id);save();render();toast('Expense deleted');} }
+                    this.newOrder = { customerName: '', phone: '', item: '', total: '', advance: '', cost: '', deliveryDate: '' };
+                    this.currentTab = 'orders';
+                    alert('Order saved successfully & WhatsApp message ready!');
+                },
 
-function renderMenu(){
-  $('menuList').innerHTML = DB.menu.length ? DB.menu.map(r=>{
-    const profit = r.price - r.cost, mg = r.cost>0 ? Math.round(profit/r.cost*100) : 0;
-    return `<div class="item"><div class="row"><h4>${esc(r.name)}</h4><b style="color:var(--brand);font-size:17px">${fmt(r.price)}<span style="font-size:11px;color:var(--mute);font-weight:500"> /lb</span></b></div>
-      <div class="grid2" style="margin-top:8px;font-size:12.5px"><span style="color:var(--mute)">Cost: <b style="color:var(--ink)">${fmt(r.cost)}/lb</b></span><span style="color:var(--mute)">Profit: <b class="${profit>=0?'ok':'bad'}">${fmt(profit)}/lb (${mg}%)</b></span></div>
-      <div class="actions"><button class="btn p" onclick="openOrder(null,'${r.id}')">🎂 Order this</button><button class="btn" onclick="openRecipe('${r.id}')">✏️ Edit</button><button class="btn r" onclick="delRecipe('${r.id}')">🗑</button></div></div>`;
-  }).join('') : `<div class="card empty"><b>📖</b>No menu items. Add your first cake.</div>`;
-}
-function delRecipe(id){ if(confirm('Delete this menu item? Existing orders keep their prices.')){DB.menu=DB.menu.filter(r=>r.id!==id);save();render();toast('Menu item removed');} }
+                deleteOrder(id) {
+                    if(confirm('Are you sure to delete this order?')) {
+                        this.orders = this.orders.filter(o => o.id !== id);
+                        this.saveData();
+                    }
+                },
 
-/* ---------- order form ---------- */
-function openOrder(id=null, recipeId=null){
-  $('oform').reset();
-  $('o-recipe').innerHTML = `<option value="">— Custom cake —</option>` + DB.menu.map(r=>`<option value="${r.id}">${esc(r.name)} · ${fmt(r.price)}/lb</option>`).join('');
-  $('o-id').value = '';
-  $('o-date').value = todayStr();
-  $('o-status').value = 'Pending';
-  $('o-weight').value = 1; $('o-extra').value = 0; $('o-disc').value = 0; $('o-paid').value = 0; $('o-cost').value = 0; $('o-rate').value='';
-  $('orderTitle').textContent = 'New Cake Order';
-  if(id){
-    const o = DB.orders.find(x=>x.id===id); if(!o) return;
-    $('orderTitle').textContent = 'Edit Cake Order';
-    $('o-id').value=o.id; $('o-name').value=o.name; $('o-phone').value=o.phone; $('o-recipe').value=o.recipeId||'';
-    $('o-cake').value=o.cake; $('o-weight').value=o.weight; $('o-rate').value=o.rate; $('o-extra').value=o.extra; $('o-disc').value=o.discount;
-    $('o-paid').value=o.paid; $('o-cost').value=o.costRate; $('o-date').value=o.date; $('o-status').value=o.status; $('o-notes').value=o.notes||'';
-  } else if(recipeId){ $('o-recipe').value = recipeId; pickRecipe(); }
-  calc(); openSheet('order');
-}
-function pickRecipe(){
-  const r = DB.menu.find(x=>x.id===$('o-recipe').value); if(!r) return;
-  $('o-cake').value = r.name; $('o-rate').value = r.price; $('o-cost').value = r.cost; calc();
-}
-function stepW(d){ $('o-weight').value = Math.max(.5, num($('o-weight').value)+d); calc(); }
-function setW(w){ $('o-weight').value = w; calc(); }
-function payPct(p){ $('o-paid').value = Math.round(calcTotal()*p); calc(); }
-function calcTotal(){ return Math.max(0, num($('o-weight').value)*num($('o-rate').value) + num($('o-extra').value) - num($('o-disc').value)); }
-function calc(){
-  const total = calcTotal(), paid = num($('o-paid').value), cost = num($('o-weight').value)*num($('o-cost').value);
-  $('c-total').textContent = fmt(total);
-  const due = total - paid;
-  $('c-due').textContent = due < 0 ? `${fmt(0)} (overpaid ${fmt(-due)})` : fmt(due);
-  $('c-due').className = due>0 ? 'due' : 'ok';
-  $('c-cost').textContent = fmt(cost);
-  const pr = total - cost; $('c-profit').textContent = fmt(pr); $('c-profit').className = pr>=0?'ok':'bad';
-}
-function saveOrder(e){
-  e.preventDefault();
-  const id = $('o-id').value;
-  const o = {
-    id: id || uid(), name:$('o-name').value.trim(), phone:$('o-phone').value.trim(), recipeId:$('o-recipe').value,
-    cake:$('o-cake').value.trim(), weight:num($('o-weight').value), rate:num($('o-rate').value),
-    extra:num($('o-extra').value), discount:num($('o-disc').value), paid:num($('o-paid').value), costRate:num($('o-cost').value),
-    date:$('o-date').value, status:$('o-status').value, notes:$('o-notes').value.trim()
-  };
-  if(id){ const i = DB.orders.findIndex(x=>x.id===id); if(i>-1) DB.orders[i]=o; } else DB.orders.unshift(o);
-  if(o.date.slice(0,7)!==ym) ym = o.date.slice(0,7);
-  save(); closeSheet('order'); render(); toast(id?'Order updated':'Order saved ✔');
-}
+                addExpense() {
+                    this.expenses.unshift({ id: Date.now(), ...this.newExpense });
+                    this.saveData();
+                    this.newExpense = { title: '', amount: '' };
+                },
 
-/* ---------- payments ---------- */
-function openPay(id){
-  const o = DB.orders.find(x=>x.id===id); if(!o) return;
-  $('p-id').value = id; $('p-amt').value = orderDue(o);
-  $('payInfo').textContent = `${o.name} · ${o.cake} · Total ${fmt(orderTotal(o))} · Due ${fmt(orderDue(o))}`;
-  openSheet('pay');
-}
-function savePay(e){
-  e.preventDefault();
-  const o = DB.orders.find(x=>x.id===$('p-id').value); if(!o) return;
-  o.paid = num(o.paid) + num($('p-amt').value);
-  save(); closeSheet('pay'); render(); toast('Payment recorded 💵');
-}
+                deleteExpense(id) {
+                    this.expenses = this.expenses.filter(e => e.id !== id);
+                    this.saveData();
+                },
 
-/* ---------- expenses ---------- */
-function openExpense(id=null){
-  $('e-cat').innerHTML = CATS.map(c=>`<option>${c}</option>`).join('');
-  $('e-id').value=''; $('e-title').value=''; $('e-amt').value=''; $('e-date').value=todayStr(); $('e-cat').value='Ingredients';
-  $('expTitle').textContent='Add Bazar / Expense';
-  if(id){ const x=DB.expenses.find(e=>e.id===id); if(!x) return;
-    $('expTitle').textContent='Edit Expense'; $('e-id').value=x.id; $('e-title').value=x.title; $('e-amt').value=x.amount; $('e-date').value=x.date; $('e-cat').value=x.cat; }
-  openSheet('exp');
-}
-function saveExpense(e){
-  e.preventDefault();
-  const id=$('e-id').value;
-  const x={id:id||uid(),title:$('e-title').value.trim(),amount:num($('e-amt').value),date:$('e-date').value,cat:$('e-cat').value};
-  if(id){const i=DB.expenses.findIndex(v=>v.id===id); if(i>-1)DB.expenses[i]=x;} else DB.expenses.unshift(x);
-  if(x.date.slice(0,7)!==ym) ym=x.date.slice(0,7);
-  save(); closeSheet('exp'); render(); toast('Expense saved ✔');
-}
+                saveData() {
+                    localStorage.setItem('bakeflow_orders', JSON.stringify(this.orders));
+                    localStorage.setItem('bakeflow_expenses', JSON.stringify(this.expenses));
+                    setTimeout(() => lucide.createIcons(), 50);
+                },
 
-/* ---------- recipes ---------- */
-function ingRow(n='',c=''){
-  const d=document.createElement('div'); d.className='ing';
-  d.innerHTML=`<input placeholder="e.g. Flour 1kg" value="${esc(n)}"><input type="number" min="0" inputmode="numeric" placeholder="৳" value="${esc(c)}" oninput="recCalc(true)"><button type="button" aria-label="Remove">✕</button>`;
-  d.querySelector('button').onclick=()=>{d.remove();recCalc(true)};
-  return d;
-}
-function addIng(n,c){ $('r-ings').appendChild(ingRow(n,c)); }
-function openRecipe(id=null){
-  $('r-ings').innerHTML=''; $('r-id').value=''; $('r-name').value=''; $('r-yield').value=1; $('r-cost').value=''; $('r-price').value=''; $('r-margin').value=DB.settings.margin;
-  $('recTitle').textContent='Add Menu Item';
-  if(id){ const r=DB.menu.find(x=>x.id===id); if(!r) return;
-    $('recTitle').textContent='Edit Menu Item'; $('r-id').value=r.id; $('r-name').value=r.name; $('r-yield').value=r.yield||1;
-    $('r-cost').value=r.cost; $('r-price').value=r.price; $('r-margin').value=r.margin??DB.settings.margin;
-    (r.ings||[]).forEach(i=>addIng(i.n,i.c)); }
-  recCalc(); openSheet('rec');
-}
-function ingTotal(){ let t=0, n=0; document.querySelectorAll('#r-ings .ing').forEach(d=>{const v=num(d.children[1].value); if(v>0){t+=v;n++}}); return {t,n}; }
-function recCalc(fromIng=false){
-  const {t,n} = ingTotal();
-  if(fromIng && n>0){ const y=Math.max(.5,num($('r-yield').value)); $('r-cost').value = Math.round(t/y); }
-  $('r-hint').textContent = n>0 ? `Ingredients total ${fmt(t)} ÷ ${$('r-yield').value||1} lb yield = cost per lb.` : 'Add ingredient costs and the cost per lb is calculated for you.';
-  if(n>0 && !fromIng){ const y=Math.max(.5,num($('r-yield').value)); $('r-cost').value = Math.round(t/y); }
-  const cost=num($('r-cost').value), mg=num($('r-margin').value), price=num($('r-price').value);
-  $('r-sugg').textContent = fmt(cost*(1+mg/100));
-  $('r-profit').textContent = fmt(price-cost);
-  $('r-actual').textContent = cost>0 ? Math.round((price-cost)/cost*100)+'%' : '—';
-}
-function applySuggest(){ const c=num($('r-cost').value), m=num($('r-margin').value); $('r-price').value=Math.round(c*(1+m/100)/10)*10; recCalc(); }
-function saveRecipe(e){
-  e.preventDefault();
-  const ings=[]; document.querySelectorAll('#r-ings .ing').forEach(d=>{const n=d.children[0].value.trim(), c=num(d.children[1].value); if(n||c) ings.push({n,c});});
-  const id=$('r-id').value;
-  const r={id:id||uid(),name:$('r-name').value.trim(),price:num($('r-price').value),cost:num($('r-cost').value),margin:num($('r-margin').value),yield:num($('r-yield').value)||1,ings};
-  if(id){const i=DB.menu.findIndex(x=>x.id===id); if(i>-1)DB.menu[i]=r;} else DB.menu.push(r);
-  save(); closeSheet('rec'); render(); toast('Menu item saved ✔');
-}
+                sendWhatsApp(order) {
+                    const due = order.total - order.advance;
+                    const msg = `Hello *${order.customerName}*,\n\nThank you for ordering with us! 🎂\n\n*Order Details:*\n- Item: ${order.item}\n- Total Amount: ৳${order.total}\n- Paid (Advance): ৳${order.advance}\n- Due Balance: ৳${due}\n- Delivery Date: ${order.deliveryDate}\n\nWe look forward to serving you the best taste! ✨`;
+                    const url = `https://wa.me/88${order.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
+                    window.open(url, '_blank');
+                },
 
-/* ---------- settings / backup ---------- */
-function openSettings(){ $('s-biz').value=DB.settings.biz; $('s-margin').value=DB.settings.margin; openSheet('set'); }
-function saveSettings(){ DB.settings.biz=$('s-biz').value.trim()||'Smart Bakery & Cake OS'; DB.settings.margin=num($('s-margin').value); save(); closeSheet('set'); render(); toast('Settings saved'); }
-function exportData(){
-  const blob = new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`bakery_backup_${todayStr()}.json`; document.body.appendChild(a); a.click(); a.remove();
-  toast('Backup downloaded');
-}
-function importData(ev){
-  const f=ev.target.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=()=>{ try{
-    const d=JSON.parse(r.result);
-    if(!Array.isArray(d.orders)||!Array.isArray(d.expenses)||!Array.isArray(d.menu)) throw 0;
-    if(!confirm('Replace all current data with this backup?')) return;
-    DB=Object.assign(DEFAULTS(),d); save(); closeSheet('set'); render(); toast('Backup restored ✔');
-  }catch(_){ toast('⚠ Invalid backup file'); } };
-  r.readAsText(f); ev.target.value='';
-}
-function resetAll(){ if(confirm('Delete ALL orders, expenses and menu items? This cannot be undone.') && confirm('Really erase everything?')){ DB=DEFAULTS(); save(); closeSheet('set'); render(); toast('All data reset'); } }
+                printInvoice(order) {
+                    const due = order.total - order.advance;
+                    const printWindow = window.open('', '_print', 'width=400,height=600');
+                    printWindow.document.write(`
+                        <html><head><title>Invoice</title><style>body{font-family:sans-serif;padding:20px;font-size:14px;}h2{text-align:center;color:#ea580c;}</style></head>
+                        <body>
+                            <h2>BakeFlow Bakery</h2>
+                            <p><b>Customer:</b> ${order.customerName}</p>
+                            <p><b>Phone:</b> ${order.phone}</p>
+                            <p><b>Item:</b> ${order.item}</p>
+                            <p><b>Delivery:</b> ${order.deliveryDate}</p>
+                            <hr>
+                            <p><b>Total:</b> ৳${order.total}</p>
+                            <p><b>Paid:</b> ৳${order.advance}</p>
+                            <p><b>Due:</b> ৳${due}</p>
+                            <hr><p style="text-align:center;">Thank you!</p>
+                        </body></html>
+                    `);
+                    printWindow.document.close();
+                    printWindow.print();
+                },
 
-/* ---------- init ---------- */
-load(); render();
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.ov.on').forEach(o=>o.classList.remove('on')); });
-</script>
+                exportData() {
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({orders: this.orders, expenses: this.expenses}));
+                    const downloadAnchor = document.createElement('a');
+                    downloadAnchor.setAttribute("href", dataStr);
+                    downloadAnchor.setAttribute("download", "bakeflow_backup.json");
+                    document.body.appendChild(downloadAnchor);
+                    downloadAnchor.click();
+                    downloadAnchor.remove();
+                },
+
+                get totalSales() {
+                    return this.orders.reduce((sum, o) => sum + Number(o.total), 0);
+                },
+
+                get totalProfit() {
+                    return this.orders.reduce((sum, o) => sum + (Number(o.total) - Number(o.cost)), 0);
+                },
+
+                get totalDue() {
+                    return this.orders.reduce((sum, o) => sum + (Number(o.total) - Number(o.advance)), 0);
+                },
+
+                get filteredOrders() {
+                    if(!this.searchQuery) return this.orders;
+                    const q = this.searchQuery.toLowerCase();
+                    return this.orders.filter(o => o.customerName.toLowerCase().includes(q) || o.phone.includes(q));
+                }
+            }));
+        });
+    </script>
 </body>
 </html>
