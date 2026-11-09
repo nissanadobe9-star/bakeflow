@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BakeFlow - Smart Bakery & Cake Order Management System</title>
+    <title>BakeFlow Cloud - Smart Bakery OS</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -24,535 +24,342 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body x-data="bakeFlowApp()" :class="darkMode ? 'dark bg-darkBg text-slate-100' : 'bg-slate-50 text-slate-800'" class="min-h-screen transition-colors duration-300">
+<body x-data="bakeFlowCloud()" :class="darkMode ? 'dark bg-darkBg text-slate-100' : 'bg-slate-50 text-slate-800'" class="min-h-screen transition-colors duration-300">
 
-    <!-- Profile Setup Modal (If no profile exists) -->
-    <div x-show="!shopProfile.isSetup" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+    <!-- AUTHENTICATION MODAL (LOGIN / SIGNUP) -->
+    <div x-show="!currentUser" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
         <div class="bg-white dark:bg-cardBg max-w-md w-full p-6 rounded-2xl shadow-2xl space-y-4">
             <div class="text-center">
                 <div class="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto text-3xl mb-2">🧁</div>
-                <h2 class="text-2xl font-bold">Welcome to BakeFlow</h2>
-                <p class="text-sm text-slate-500">Setup your shop account to get started.</p>
+                <h2 class="text-2xl font-bold" x-text="isSignUp ? 'Create Cloud Account' : 'Welcome Back'"></h2>
+                <p class="text-sm text-slate-500">Access your bakery business from any device worldwide.</p>
             </div>
-            <form @submit.prevent="saveProfile" class="space-y-4">
+
+            <form @submit.prevent="handleAuth" class="space-y-4">
+                <template x-if="isSignUp">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Bakery / Business Name</label>
+                        <input type="text" x-model="authForm.shopName" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="Sweet Delights Bakery">
+                    </div>
+                </template>
                 <div>
-                    <label class="block text-sm font-medium mb-1">Shop / Business Name</label>
-                    <input type="text" x-model="tempProfile.shopName" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="e.g. Sweet Delights Bakery">
+                    <label class="block text-sm font-medium mb-1">Email Address</label>
+                    <input type="email" x-model="authForm.email" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="owner@gmail.com">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">Owner Gmail</label>
-                    <input type="email" x-model="tempProfile.email" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="owner@gmail.com">
+                    <label class="block text-sm font-medium mb-1">Password</label>
+                    <input type="password" x-model="authForm.password" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="••••••••">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Phone Number (WhatsApp)</label>
-                    <input type="text" x-model="tempProfile.phone" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="018XXXXXXXX">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Shop Logo (Upload Image)</label>
-                    <input type="file" @change="handleLogoUpload" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
-                </div>
-                <button type="submit" class="w-full py-3 bg-primary text-white font-medium rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition">Save & Start Business</button>
+
+                <div x-show="authError" class="text-rose-500 text-xs font-semibold text-center" x-text="authError"></div>
+
+                <button type="submit" class="w-full py-3 bg-primary text-white font-medium rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition" x-text="isLoading ? 'Connecting Cloud...' : (isSignUp ? 'Create Account' : 'Login to App')"></button>
             </form>
+
+            <div class="text-center text-sm text-slate-500 pt-2">
+                <span x-text="isSignUp ? 'Already have an account?' : 'New bakery owner?'"></span>
+                <button @click="isSignUp = !isSignUp; authError=''" class="text-primary font-bold ml-1 underline" x-text="isSignUp ? 'Login here' : 'Register here'"></button>
+            </div>
         </div>
     </div>
 
-    <!-- Top Navigation / Header -->
-    <header class="sticky top-0 z-40 bg-white dark:bg-cardBg shadow-sm border-b border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-            <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-                <i data-lucide="menu" class="w-6 h-6 text-primary"></i>
-            </button>
-            <div class="flex items-center space-x-2">
-                <template x-if="shopProfile.logo">
-                    <img :src="shopProfile.logo" class="w-9 h-9 rounded-xl object-cover border border-primary">
-                </template>
-                <template x-if="!shopProfile.logo">
-                    <div class="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-bold text-lg">🍰</div>
-                </template>
-                <div>
-                    <h1 class="font-bold text-base leading-tight" x-text="shopProfile.shopName || 'BakeFlow'"></h1>
-                    <p class="text-xs text-slate-500 dark:text-slate-400" x-text="shopProfile.phone || 'Pro Bakery OS'"></p>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex items-center space-x-2">
-            <button @click="toggleDarkMode()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-                <i :data-lucide="darkMode ? 'sun' : 'moon'" class="w-5 h-5 text-amber-500"></i>
-            </button>
-        </div>
-    </header>
-
-    <!-- Sidebar Drawer -->
-    <div x-show="sidebarOpen" class="fixed inset-0 z-50 flex">
-        <div @click="sidebarOpen = false" class="fixed inset-0 bg-black/50 transition-opacity"></div>
-        <div class="relative w-72 bg-white dark:bg-cardBg h-full shadow-2xl flex flex-col z-10 p-5 space-y-6">
-            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-4">
+    <!-- MAIN APP CONTENT -->
+    <div x-show="currentUser">
+        
+        <!-- Header -->
+        <header class="sticky top-0 z-40 bg-white dark:bg-cardBg shadow-sm border-b border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i data-lucide="menu" class="w-6 h-6 text-primary"></i>
+                </button>
                 <div class="flex items-center space-x-2">
-                    <span class="text-2xl">🧁</span>
-                    <span class="font-bold text-xl">BakeFlow Menu</span>
+                    <template x-if="shopProfile.logo">
+                        <img :src="shopProfile.logo" class="w-9 h-9 rounded-xl object-cover border border-primary">
+                    </template>
+                    <template x-if="!shopProfile.logo">
+                        <div class="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-bold text-lg">🍰</div>
+                    </template>
+                    <div>
+                        <h1 class="font-bold text-base leading-tight" x-text="shopProfile.shopName || 'BakeFlow Cloud'"></h1>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" x-text="currentUser ? currentUser.email : ''"></p>
+                    </div>
                 </div>
-                <button @click="sidebarOpen = false" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
             </div>
 
-            <nav class="space-y-2 flex-1 overflow-y-auto">
-                <button @click="currentTab = 'dashboard'; sidebarOpen = false" :class="currentTab === 'dashboard' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                    <span>Dashboard</span>
+            <div class="flex items-center space-x-2">
+                <button @click="toggleDarkMode()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i :data-lucide="darkMode ? 'sun' : 'moon'" class="w-5 h-5 text-amber-500"></i>
                 </button>
-                <button @click="currentTab = 'orders'; sidebarOpen = false" :class="currentTab === 'orders' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                    <span>Orders & POS</span>
+                <button @click="logout()" title="Logout Account" class="p-2 rounded-lg hover:bg-rose-100 text-rose-500 transition">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
                 </button>
-                <button @click="currentTab = 'customers'; sidebarOpen = false" :class="currentTab === 'customers' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                    <i data-lucide="users" class="w-5 h-5"></i>
-                    <span>Customer History</span>
-                </button>
-                <button @click="currentTab = 'calendar'; sidebarOpen = false" :class="currentTab === 'calendar' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                    <i data-lucide="calendar" class="w-5 h-5"></i>
-                    <span>Delivery Calendar</span>
-                </button>
-                <button @click="currentTab = 'expenses'; sidebarOpen = false" :class="currentTab === 'expenses' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                    <i data-lucide="receipt" class="w-5 h-5"></i>
-                    <span>Expenses & Costs</span>
-                </button>
-                <button @click="currentTab = 'settings'; sidebarOpen = false" :class="currentTab === 'settings' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                    <i data-lucide="settings" class="w-5 h-5"></i>
-                    <span>Shop Settings</span>
-                </button>
-                <button @click="currentTab = 'backup'; sidebarOpen = false" :class="currentTab === 'backup' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                    <i data-lucide="database" class="w-5 h-5"></i>
-                    <span>Backup & Restore</span>
-                </button>
-            </nav>
+            </div>
+        </header>
 
-            <div class="border-t border-slate-200 dark:border-slate-700 pt-4 text-xs text-center text-slate-500">
-                BakeFlow v3.0 • PWA Ready
+        <!-- Sidebar Drawer -->
+        <div x-show="sidebarOpen" class="fixed inset-0 z-50 flex">
+            <div @click="sidebarOpen = false" class="fixed inset-0 bg-black/50 transition-opacity"></div>
+            <div class="relative w-72 bg-white dark:bg-cardBg h-full shadow-2xl flex flex-col z-10 p-5 space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-2xl">☁️</span>
+                        <span class="font-bold text-xl">Cloud Menu</span>
+                    </div>
+                    <button @click="sidebarOpen = false" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <nav class="space-y-2 flex-1 overflow-y-auto">
+                    <button @click="currentTab = 'dashboard'; sidebarOpen = false" :class="currentTab === 'dashboard' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button @click="currentTab = 'orders'; sidebarOpen = false" :class="currentTab === 'orders' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        <span>Orders & POS</span>
+                    </button>
+                    <button @click="currentTab = 'settings'; sidebarOpen = false" :class="currentTab === 'settings' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                        <span>Shop Branding</span>
+                    </button>
+                </nav>
+
+                <div class="border-t border-slate-200 dark:border-slate-700 pt-4 text-xs text-center text-slate-500">
+                    BakeFlow Cloud Edition • Firebase Enabled
+                </div>
             </div>
         </div>
+
+        <!-- Main Content -->
+        <main class="max-w-6xl mx-auto p-4 md:p-6 pb-24">
+
+            <!-- DASHBOARD TAB -->
+            <div x-show="currentTab === 'dashboard'" class="space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                        <span class="text-sm text-slate-500">Total Cloud Orders</span>
+                        <h2 class="text-2xl font-bold mt-2" x-text="orders.length">0</h2>
+                    </div>
+                    <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                        <span class="text-sm text-slate-500">Total Sales</span>
+                        <h2 class="text-2xl font-bold mt-2 text-emerald-500" x-text="'৳ ' + totalSales">0</h2>
+                    </div>
+                    <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                        <span class="text-sm text-slate-500">Due Balance</span>
+                        <h2 class="text-2xl font-bold mt-2 text-rose-500" x-text="'৳ ' + totalDue">0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ORDERS TAB -->
+            <div x-show="currentTab === 'orders'" class="space-y-6">
+                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <h3 class="text-xl font-bold mb-4">Add New Order (Synced to Cloud)</h3>
+                    <form @submit.prevent="addOrder" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" x-model="newOrder.customerName" placeholder="Customer Name" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        <input type="text" x-model="newOrder.phone" placeholder="WhatsApp Phone" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        <input type="text" x-model="newOrder.item" placeholder="Cake Flavor & Weight" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        <input type="number" x-model.number="newOrder.total" placeholder="Total Amount" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        <input type="number" x-model.number="newOrder.advance" placeholder="Advance Paid" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        <input type="date" x-model="newOrder.deliveryDate" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        
+                        <div class="md:col-span-3 flex justify-end">
+                            <button type="submit" class="px-6 py-3 bg-primary text-white font-medium rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition flex items-center space-x-2">
+                                <i data-lucide="cloud-upload" class="w-5 h-5"></i>
+                                <span>Save Order & Send WhatsApp</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <h3 class="text-xl font-bold mb-4">Cloud Synced Orders</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 dark:border-slate-700 text-slate-400 text-sm">
+                                    <th class="py-3 px-4">Customer</th>
+                                    <th class="py-3 px-4">Cake</th>
+                                    <th class="py-3 px-4">Total</th>
+                                    <th class="py-3 px-4">Paid/Due</th>
+                                    <th class="py-3 px-4 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="order in orders" :key="order.id">
+                                    <tr class="border-b border-slate-100 dark:border-slate-800">
+                                        <td class="py-3 px-4 font-medium" x-text="order.customerName"></td>
+                                        <td class="py-3 px-4" x-text="order.item"></td>
+                                        <td class="py-3 px-4 font-bold" x-text="'৳ ' + order.total"></td>
+                                        <td class="py-3 px-4">
+                                            <span class="text-emerald-500" x-text="'Paid: ৳' + order.advance"></span><br>
+                                            <span class="text-rose-500 text-xs" x-text="'Due: ৳' + (order.total - order.advance)"></span>
+                                        </td>
+                                        <td class="py-3 px-4 text-center space-x-2">
+                                            <button @click="sendWhatsApp(order)" class="p-2 text-emerald-500 hover:bg-emerald-50 rounded-lg"><i data-lucide="message-circle" class="w-4 h-4"></i></button>
+                                            <button @click="deleteOrder(order.id)" class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SHOP SETTINGS TAB -->
+            <div x-show="currentTab === 'settings'" class="space-y-6">
+                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
+                    <h3 class="text-xl font-bold">Cloud Shop Settings</h3>
+                    <form @submit.prevent="updateShopProfile" class="space-y-4 max-w-lg">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Shop Name</label>
+                            <input type="text" x-model="shopProfile.shopName" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">WhatsApp Contact</label>
+                            <input type="text" x-model="shopProfile.phone" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Logo URL (or Base64)</label>
+                            <input type="text" x-model="shopProfile.logo" placeholder="https://..." class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        </div>
+                        <button type="submit" class="px-5 py-2.5 bg-primary text-white font-medium rounded-xl">Save Settings to Cloud</button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
     </div>
 
-    <!-- Main Content Area -->
-    <main class="max-w-6xl mx-auto p-4 md:p-6 pb-24">
-
-        <!-- 1. DASHBOARD TAB -->
-        <div x-show="currentTab === 'dashboard'" class="space-y-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-slate-500">Total Orders</span>
-                        <span class="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-xl"><i data-lucide="shopping-cart" class="w-5 h-5"></i></span>
-                    </div>
-                    <h2 class="text-2xl font-bold mt-2" x-text="orders.length">0</h2>
-                </div>
-                <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-slate-500">Total Sales</span>
-                        <span class="p-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 rounded-xl"><i data-lucide="dollar-sign" class="w-5 h-5"></i></span>
-                    </div>
-                    <h2 class="text-2xl font-bold mt-2" x-text="'৳ ' + totalSales">0</h2>
-                </div>
-                <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-slate-500">Estimated Profit</span>
-                        <span class="p-2 bg-amber-50 dark:bg-amber-900/30 text-amber-500 rounded-xl"><i data-lucide="trending-up" class="w-5 h-5"></i></span>
-                    </div>
-                    <h2 class="text-2xl font-bold mt-2" x-text="'৳ ' + totalProfit">0</h2>
-                </div>
-                <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-slate-500">Due / Receivable</span>
-                        <span class="p-2 bg-rose-50 dark:bg-rose-900/30 text-rose-500 rounded-xl"><i data-lucide="alert-circle" class="w-5 h-5"></i></span>
-                    </div>
-                    <h2 class="text-2xl font-bold mt-2" x-text="'৳ ' + totalDue">0</h2>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
-                <div>
-                    <h3 class="text-lg font-bold">Quick New Order</h3>
-                    <p class="text-sm text-slate-500">Create a new cake order instantly and send WhatsApp invoice.</p>
-                </div>
-                <button @click="currentTab = 'orders'" class="px-5 py-2.5 bg-primary text-white font-medium rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition flex items-center space-x-2">
-                    <i data-lucide="plus" class="w-5 h-5"></i>
-                    <span>New Order Form</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- 2. ORDERS & POS TAB -->
-        <div x-show="currentTab === 'orders'" class="space-y-6">
-            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                <h3 class="text-xl font-bold mb-4 flex items-center space-x-2">
-                    <i data-lucide="plus-circle" class="text-primary"></i>
-                    <span>Create New Cake Order</span>
-                </h3>
-
-                <form @submit.prevent="addOrder" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Customer Name</label>
-                        <input type="text" x-model="newOrder.customerName" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="e.g. Rahim Ahmed">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Phone Number (WhatsApp)</label>
-                        <input type="text" x-model="newOrder.phone" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="018XXXXXXXX">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Cake Flavor / Item</label>
-                        <input type="text" x-model="newOrder.item" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="Chocolate Truffle 1.5kg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Total Amount (৳)</label>
-                        <input type="number" x-model.number="newOrder.total" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="1200">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Advance Paid (৳)</label>
-                        <input type="number" x-model.number="newOrder.advance" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Estimated Cost (৳)</label>
-                        <input type="number" x-model.number="newOrder.cost" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="400">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Delivery Date</label>
-                        <input type="date" x-model="newOrder.deliveryDate" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary">
-                    </div>
-                    <div class="md:col-span-2 lg:col-span-3 flex justify-end mt-2">
-                        <button type="submit" class="px-6 py-3 bg-primary text-white font-medium rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition flex items-center space-x-2">
-                            <i data-lucide="check" class="w-5 h-5"></i>
-                            <span>Save Order & Send WhatsApp Invoice</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                <h3 class="text-xl font-bold mb-4">All Orders History</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-200 dark:border-slate-700 text-slate-400 text-sm">
-                                <th class="py-3 px-4">Customer</th>
-                                <th class="py-3 px-4">Cake Item</th>
-                                <th class="py-3 px-4">Total</th>
-                                <th class="py-3 px-4">Paid / Due</th>
-                                <th class="py-3 px-4">Delivery</th>
-                                <th class="py-3 px-4 text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
-                            <template x-for="order in orders" :key="order.id">
-                                <tr>
-                                    <td class="py-3 px-4 font-medium">
-                                        <div x-text="order.customerName"></div>
-                                        <div class="text-xs text-slate-400" x-text="order.phone"></div>
-                                    </td>
-                                    <td class="py-3 px-4" x-text="order.item"></td>
-                                    <td class="py-3 px-4" x-text="'৳ ' + order.total"></td>
-                                    <td class="py-3 px-4">
-                                        <span class="text-emerald-500" x-text="'Paid: ৳ ' + order.advance"></span><br>
-                                        <span class="text-rose-500 text-xs" x-text="'Due: ৳ ' + (order.total - order.advance)"></span>
-                                    </td>
-                                    <td class="py-3 px-4 text-xs" x-text="order.deliveryDate"></td>
-                                    <td class="py-3 px-4 text-center flex items-center justify-center space-x-2">
-                                        <button @click="sendWhatsApp(order)" title="Send WhatsApp Invoice" class="p-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 rounded-lg hover:bg-emerald-100 transition">
-                                            <i data-lucide="message-circle" class="w-4 h-4"></i>
-                                        </button>
-                                        <button @click="printInvoice(order)" title="Print Cash Memo" class="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-lg hover:bg-blue-100 transition">
-                                            <i data-lucide="printer" class="w-4 h-4"></i>
-                                        </button>
-                                        <button @click="deleteOrder(order.id)" title="Delete" class="p-2 bg-rose-50 dark:bg-rose-900/30 text-rose-600 rounded-lg hover:bg-rose-100 transition">
-                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </template>
-                            <template x-if="orders.length === 0">
-                                <tr>
-                                    <td colspan="6" class="py-8 text-center text-slate-400">No orders found yet. Create your first order above!</td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. CUSTOMER HISTORY & SEARCH TAB -->
-        <div x-show="currentTab === 'customers'" class="space-y-6">
-            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                <h3 class="text-xl font-bold mb-4">Customer Database & Search</h3>
-                <div class="mb-4">
-                    <input type="text" x-model="searchQuery" placeholder="Search by customer name or phone number..." class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary">
-                </div>
-                <div class="space-y-3">
-                    <template x-for="order in filteredOrders" :key="order.id">
-                        <div class="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                            <div>
-                                <h4 class="font-bold text-base" x-text="order.customerName"></h4>
-                                <p class="text-xs text-slate-500" x-text="'Phone: ' + order.phone + ' • Ordered Item: ' + order.item"></p>
-                            </div>
-                            <div class="text-right">
-                                <span class="font-bold text-primary" x-text="'৳ ' + order.total"></span>
-                                <p class="text-xs text-slate-400" x-text="order.deliveryDate"></p>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. DELIVERY CALENDAR TAB -->
-        <div x-show="currentTab === 'calendar'" class="space-y-6">
-            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                <h3 class="text-xl font-bold mb-4">Upcoming Cake Deliveries</h3>
-                <div class="space-y-3">
-                    <template x-for="order in orders" :key="order.id">
-                        <div class="p-4 rounded-xl border-l-4 border-primary bg-slate-50 dark:bg-slate-900 flex justify-between items-center">
-                            <div>
-                                <h4 class="font-bold" x-text="order.item"></h4>
-                                <p class="text-xs text-slate-500" x-text="'Customer: ' + order.customerName + ' (' + order.phone + ')'"></p>
-                            </div>
-                            <div class="text-right">
-                                <span class="px-3 py-1 bg-primary/10 text-primary rounded-lg text-xs font-semibold" x-text="order.deliveryDate"></span>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-        </div>
-
-        <!-- 5. EXPENSES TAB -->
-        <div x-show="currentTab === 'expenses'" class="space-y-6">
-            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                <h3 class="text-xl font-bold mb-4">Add Business Expense</h3>
-                <form @submit.prevent="addExpense" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Expense Title</label>
-                        <input type="text" x-model="newExpense.title" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" placeholder="e.g. Flour, Chocolate">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Amount (৳)</label>
-                        <input type="number" x-model.number="newExpense.amount" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" placeholder="350">
-                    </div>
-                    <div class="flex items-end">
-                        <button type="submit" class="w-full py-2.5 bg-slate-800 dark:bg-slate-700 text-white font-medium rounded-xl hover:bg-slate-700 transition">Add Expense</button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                <h3 class="text-xl font-bold mb-4">Expense Records</h3>
-                <div class="space-y-2">
-                    <template x-for="exp in expenses" :key="exp.id">
-                        <div class="flex justify-between items-center p-3 rounded-xl border border-slate-100 dark:border-slate-800">
-                            <span x-text="exp.title" class="font-medium"></span>
-                            <div class="flex items-center space-x-3">
-                                <span class="text-rose-500 font-bold" x-text="'- ৳ ' + exp.amount"></span>
-                                <button @click="deleteExpense(exp.id)" class="text-slate-400 hover:text-rose-500"><i data-lucide="trash" class="w-4 h-4"></i></button>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-        </div>
-
-        <!-- 6. SHOP SETTINGS TAB -->
-        <div x-show="currentTab === 'settings'" class="space-y-6">
-            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
-                <h3 class="text-xl font-bold">Shop Profile Settings</h3>
-                <form @submit.prevent="updateProfile" class="space-y-4 max-w-lg">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Shop / Business Name</label>
-                        <input type="text" x-model="shopProfile.shopName" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Owner Gmail</label>
-                        <input type="email" x-model="shopProfile.email" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Phone Number (WhatsApp)</label>
-                        <input type="text" x-model="shopProfile.phone" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Update Shop Logo</label>
-                        <input type="file" @change="handleLogoUpload" accept="image/*" class="w-full text-sm text-slate-500">
-                    </div>
-                    <button type="submit" class="px-5 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-primary/90 transition">Update Settings</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- 7. BACKUP TAB -->
-        <div x-show="currentTab === 'backup'" class="space-y-6">
-            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
-                <h3 class="text-xl font-bold">Data Backup & Restore</h3>
-                <p class="text-sm text-slate-500">Keep your bakery orders safe by exporting data as JSON file.</p>
-                <button @click="exportData" class="px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition flex items-center space-x-2">
-                    <i data-lucide="download" class="w-5 h-5"></i>
-                    <span>Export Backup JSON</span>
-                </button>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- App Logic Script -->
+    <!-- APP FIREBASE & ALPINE LOGIC -->
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDP9A4C78LP1VBJuVwdiotnzvWS_Lhnytk",
+            authDomain: "bakeflow-fc939.firebaseapp.com",
+            projectId: "bakeflow-fc939",
+            storageBucket: "bakeflow-fc939.firebasestorage.app",
+            messagingSenderId: "1034318320533",
+            appId: "1:1034318320533:web:3a7704c242490886b69c9c",
+            measurementId: "G-FDPX5SRGRP"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
         document.addEventListener('alpine:init', () => {
-            Alpine.data('bakeFlowApp', () => ({
+            Alpine.data('bakeFlowCloud', () => ({
                 currentTab: 'dashboard',
                 sidebarOpen: false,
                 darkMode: true,
-                searchQuery: '',
-                
-                shopProfile: JSON.parse(localStorage.getItem('bakeflow_profile')) || { isSetup: false, shopName: '', email: '', phone: '', logo: '' },
-                tempProfile: { shopName: '', email: '', phone: '', logo: '' },
-                
-                orders: JSON.parse(localStorage.getItem('bakeflow_orders')) || [],
-                expenses: JSON.parse(localStorage.getItem('bakeflow_expenses')) || [],
-                
-                newOrder: { customerName: '', phone: '', item: '', total: '', advance: '', cost: '', deliveryDate: '' },
-                newExpense: { title: '', amount: '' },
+                currentUser: null,
+                isSignUp: false,
+                isLoading: false,
+                authError: '',
+
+                authForm: { email: '', password: '', shopName: '' },
+                shopProfile: { shopName: '', phone: '', logo: '' },
+                orders: [],
+                newOrder: { customerName: '', phone: '', item: '', total: '', advance: '', deliveryDate: '' },
 
                 init() {
-                    setTimeout(() => lucide.createIcons(), 100);
+                    auth.onAuthStateChanged(user => {
+                        if (user) {
+                            this.currentUser = user;
+                            this.fetchCloudData();
+                        } else {
+                            this.currentUser = null;
+                        }
+                        setTimeout(() => lucide.createIcons(), 100);
+                    });
                 },
 
-                toggleDarkMode() {
-                    this.darkMode = !this.darkMode;
-                },
+                toggleDarkMode() { this.darkMode = !this.darkMode; },
 
-                handleLogoUpload(event) {
-                    const file = event.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            this.tempProfile.logo = e.target.result;
-                            this.shopProfile.logo = e.target.result;
-                        };
-                        reader.readAsDataURL(file);
+                async handleAuth() {
+                    this.isLoading = true;
+                    this.authError = '';
+                    try {
+                        if (this.isSignUp) {
+                            const res = await auth.createUserWithEmailAndPassword(this.authForm.email, this.authForm.password);
+                            await db.collection('users').doc(res.user.uid).set({
+                                shopName: this.authForm.shopName,
+                                email: this.authForm.email,
+                                phone: '',
+                                logo: ''
+                            });
+                        } else {
+                            await auth.signInWithEmailAndPassword(this.authForm.email, this.authForm.password);
+                        }
+                    } catch (err) {
+                        this.authError = err.message;
+                    } finally {
+                        this.isLoading = false;
                     }
                 },
 
-                saveProfile() {
-                    this.shopProfile.isSetup = true;
-                    this.shopProfile.shopName = this.tempProfile.shopName;
-                    this.shopProfile.email = this.tempProfile.email;
-                    this.shopProfile.phone = this.tempProfile.phone;
-                    localStorage.setItem('bakeflow_profile', JSON.stringify(this.shopProfile));
-                    alert('Shop profile created successfully!');
+                logout() {
+                    auth.signOut();
                 },
 
-                updateProfile() {
-                    localStorage.setItem('bakeflow_profile', JSON.stringify(this.shopProfile));
-                    alert('Shop settings updated successfully!');
+                fetchCloudData() {
+                    if (!this.currentUser) return;
+
+                    // Listen to Profile
+                    db.collection('users').doc(this.currentUser.uid).onSnapshot(doc => {
+                        if (doc.exists) this.shopProfile = doc.data();
+                    });
+
+                    // Listen to Orders in Realtime
+                    db.collection('users').doc(this.currentUser.uid).collection('orders')
+                      .orderBy('createdAt', 'desc')
+                      .onSnapshot(snapshot => {
+                          this.orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                          setTimeout(() => lucide.createIcons(), 50);
+                      });
                 },
 
-                addOrder() {
-                    const order = { id: Date.now(), ...this.newOrder };
-                    this.orders.unshift(order);
-                    this.saveData();
-                    this.sendWhatsApp(order);
-                    this.newOrder = { customerName: '', phone: '', item: '', total: '', advance: '', cost: '', deliveryDate: '' };
-                    this.currentTab = 'orders';
-                    alert('Order saved successfully & WhatsApp message ready!');
+                async addOrder() {
+                    if (!this.currentUser) return;
+                    const orderData = { ...this.newOrder, createdAt: new Date().toISOString() };
+                    await db.collection('users').doc(this.currentUser.uid).collection('orders').add(orderData);
+                    this.sendWhatsApp(this.newOrder);
+                    this.newOrder = { customerName: '', phone: '', item: '', total: '', advance: '', deliveryDate: '' };
+                    alert('Order synced to Firebase Cloud!');
                 },
 
-                deleteOrder(id) {
-                    if(confirm('Are you sure to delete this order?')) {
-                        this.orders = this.orders.filter(o => o.id !== id);
-                        this.saveData();
+                async deleteOrder(id) {
+                    if (confirm('Delete this order permanently from Cloud?')) {
+                        await db.collection('users').doc(this.currentUser.uid).collection('orders').doc(id).delete();
                     }
                 },
 
-                addExpense() {
-                    this.expenses.unshift({ id: Date.now(), ...this.newExpense });
-                    this.saveData();
-                    this.newExpense = { title: '', amount: '' };
-                },
-
-                deleteExpense(id) {
-                    this.expenses = this.expenses.filter(e => e.id !== id);
-                    this.saveData();
-                },
-
-                saveData() {
-                    localStorage.setItem('bakeflow_orders', JSON.stringify(this.orders));
-                    localStorage.setItem('bakeflow_expenses', JSON.stringify(this.expenses));
-                    setTimeout(() => lucide.createIcons(), 50);
+                async updateShopProfile() {
+                    await db.collection('users').doc(this.currentUser.uid).update(this.shopProfile);
+                    alert('Profile updated on Cloud!');
                 },
 
                 sendWhatsApp(order) {
                     const due = order.total - order.advance;
-                    const msg = `Hello *${order.customerName}*,\n\nThank you for ordering from *${this.shopProfile.shopName}*! 🎂\n\n*Order Details:*\n- Item: ${order.item}\n- Total: ৳${order.total}\n- Paid: ৳${order.advance}\n- Due: ৳${due}\n- Delivery: ${order.deliveryDate}\n\nContact: ${this.shopProfile.phone}`;
-                    const url = `https://wa.me/88${order.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
-                    window.open(url, '_blank');
+                    const msg = `Hello *${order.customerName}*,\n\nThank you for ordering from *${this.shopProfile.shopName}*! 🎂\n\n*Order Details:*\n- Item: ${order.item}\n- Total: ৳${order.total}\n- Paid: ৳${order.advance}\n- Due: ৳${due}\n- Delivery: ${order.deliveryDate}`;
+                    window.open(`https://wa.me/88${order.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
                 },
 
-                printInvoice(order) {
-                    const due = order.total - order.advance;
-                    const printWindow = window.open('', '_print', 'width=400,height=600');
-                    printWindow.document.write(`
-                        <html><head><title>Invoice</title><style>body{font-family:sans-serif;padding:20px;font-size:14px;text-align:center;}h2{color:#ea580c;margin:5px 0;}</style></head>
-                        <body>
-                            ${this.shopProfile.logo ? `<img src="${this.shopProfile.logo}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin:auto;">` : ''}
-                            <h2>${this.shopProfile.shopName}</h2>
-                            <p style="font-size:12px;color:#555;">Phone: ${this.shopProfile.phone} | Email: ${this.shopProfile.email}</p>
-                            <hr>
-                            <div style="text-align:left;">
-                                <p><b>Customer:</b> ${order.customerName}</p>
-                                <p><b>Phone:</b> ${order.phone}</p>
-                                <p><b>Item:</b> ${order.item}</p>
-                                <p><b>Delivery:</b> ${order.deliveryDate}</p>
-                            </div>
-                            <hr>
-                            <div style="text-align:left;">
-                                <p><b>Total:</b> ৳${order.total}</p>
-                                <p><b>Paid:</b> ৳${order.advance}</p>
-                                <p><b>Due:</b> ৳${due}</p>
-                            </div>
-                            <hr><p style="font-size:12px;">Thank you for your business!</p>
-                        </body></html>
-                    `);
-                    printWindow.document.close();
-                    printWindow.print();
-                },
-
-                exportData() {
-                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({profile: this.shopProfile, orders: this.orders, expenses: this.expenses}));
-                    const downloadAnchor = document.createElement('a');
-                    downloadAnchor.setAttribute("href", dataStr);
-                    downloadAnchor.setAttribute("download", "bakeflow_backup.json");
-                    document.body.appendChild(downloadAnchor);
-                    downloadAnchor.click();
-                    downloadAnchor.remove();
-                },
-
-                get totalSales() {
-                    return this.orders.reduce((sum, o) => sum + Number(o.total), 0);
-                },
-
-                get totalProfit() {
-                    return this.orders.reduce((sum, o) => sum + (Number(o.total) - Number(o.cost)), 0);
-                },
-
-                get totalDue() {
-                    return this.orders.reduce((sum, o) => sum + (Number(o.total) - Number(o.advance)), 0);
-                },
-
-                get filteredOrders() {
-                    if(!this.searchQuery) return this.orders;
-                    const q = this.searchQuery.toLowerCase();
-                    return this.orders.filter(o => o.customerName.toLowerCase().includes(q) || o.phone.includes(q));
-                }
+                get totalSales() { return this.orders.reduce((sum, o) => sum + Number(o.total), 0); },
+                get totalDue() { return this.orders.reduce((sum, o) => sum + (Number(o.total) - Number(o.advance)), 0); }
             }));
         });
     </script>
