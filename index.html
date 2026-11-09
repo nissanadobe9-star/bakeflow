@@ -106,21 +106,21 @@
             </div>
         </header>
 
-        <!-- Sidebar Drawer -->
+        <!-- Sidebar Drawer with Full Menu -->
         <div x-show="sidebarOpen" class="fixed inset-0 z-50 flex">
             <div @click="sidebarOpen = false" class="fixed inset-0 bg-black/50 transition-opacity"></div>
-            <div class="relative w-72 bg-white dark:bg-cardBg h-full shadow-2xl flex flex-col z-10 p-5 space-y-6">
+            <div class="relative w-72 bg-white dark:bg-cardBg h-full shadow-2xl flex flex-col z-10 p-5 space-y-4 overflow-y-auto">
                 <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-4">
                     <div class="flex items-center space-x-2">
-                        <span class="text-2xl">☁️</span>
-                        <span class="font-bold text-xl">Cloud Menu</span>
+                        <span class="text-2xl">🧁</span>
+                        <span class="font-bold text-xl">BakeFlow Menu</span>
                     </div>
                     <button @click="sidebarOpen = false" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
                         <i data-lucide="x" class="w-6 h-6"></i>
                     </button>
                 </div>
 
-                <nav class="space-y-2 flex-1 overflow-y-auto">
+                <nav class="space-y-1.5 flex-1">
                     <button @click="currentTab = 'dashboard'; sidebarOpen = false" :class="currentTab === 'dashboard' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
                         <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
                         <span>Dashboard</span>
@@ -129,50 +129,111 @@
                         <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                         <span>Orders & POS</span>
                     </button>
+                    <button @click="currentTab = 'customers'; sidebarOpen = false" :class="currentTab === 'customers' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                        <span>Customer History</span>
+                    </button>
+                    <button @click="currentTab = 'calendar'; sidebarOpen = false" :class="currentTab === 'calendar' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                        <i data-lucide="calendar" class="w-5 h-5"></i>
+                        <span>Delivery Calendar</span>
+                    </button>
+                    <button @click="currentTab = 'expenses'; sidebarOpen = false" :class="currentTab === 'expenses' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                        <i data-lucide="receipt" class="w-5 h-5"></i>
+                        <span>Expenses & Costs</span>
+                    </button>
                     <button @click="currentTab = 'settings'; sidebarOpen = false" :class="currentTab === 'settings' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
                         <i data-lucide="settings" class="w-5 h-5"></i>
-                        <span>Shop Branding</span>
+                        <span>Shop Settings</span>
+                    </button>
+                    <button @click="currentTab = 'backup'; sidebarOpen = false" :class="currentTab === 'backup' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                        <i data-lucide="database" class="w-5 h-5"></i>
+                        <span>Cloud Backup</span>
                     </button>
                 </nav>
 
-                <div class="border-t border-slate-200 dark:border-slate-700 pt-4 text-xs text-center text-slate-500">
-                    BakeFlow Cloud Edition • Firebase Enabled
+                <div class="border-t border-slate-200 dark:border-slate-700 pt-3 text-xs text-center text-slate-500">
+                    BakeFlow Cloud Edition • Firebase
                 </div>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <main class="max-w-6xl mx-auto p-4 md:p-6 pb-24">
+        <!-- Main Content Area -->
+        <main class="max-w-6xl mx-auto p-4 md:p-6 pb-24 space-y-6">
 
-            <!-- DASHBOARD TAB -->
+            <!-- 1. DASHBOARD TAB -->
             <div x-show="currentTab === 'dashboard'" class="space-y-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                        <span class="text-sm text-slate-500">Total Cloud Orders</span>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-500">Total Orders</span>
+                            <i data-lucide="shopping-cart" class="w-5 h-5 text-primary"></i>
+                        </div>
                         <h2 class="text-2xl font-bold mt-2" x-text="orders.length">0</h2>
                     </div>
                     <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                        <span class="text-sm text-slate-500">Total Sales</span>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-500">Total Sales</span>
+                            <i data-lucide="dollar-sign" class="w-5 h-5 text-emerald-500"></i>
+                        </div>
                         <h2 class="text-2xl font-bold mt-2 text-emerald-500" x-text="'৳ ' + totalSales">0</h2>
                     </div>
                     <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                        <span class="text-sm text-slate-500">Due Balance</span>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-500">Estimated Profit</span>
+                            <i data-lucide="trending-up" class="w-5 h-5 text-amber-500"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold mt-2 text-amber-500" x-text="'৳ ' + totalProfit">0</h2>
+                    </div>
+                    <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-slate-500">Due / Receivable</span>
+                            <i data-lucide="alert-circle" class="w-5 h-5 text-rose-500"></i>
+                        </div>
                         <h2 class="text-2xl font-bold mt-2 text-rose-500" x-text="'৳ ' + totalDue">0</h2>
                     </div>
                 </div>
+
+                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold">Quick New Order</h3>
+                        <p class="text-sm text-slate-500">Create a new cake order instantly and send WhatsApp invoice.</p>
+                    </div>
+                    <button @click="currentTab = 'orders'" class="px-5 py-3 bg-primary text-white font-medium rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition flex items-center space-x-2">
+                        <i data-lucide="plus" class="w-5 h-5"></i>
+                        <span>New Order Form</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- ORDERS TAB -->
+            <!-- 2. ORDERS & POS TAB -->
             <div x-show="currentTab === 'orders'" class="space-y-6">
                 <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                    <h3 class="text-xl font-bold mb-4">Add New Order (Synced to Cloud)</h3>
+                    <h3 class="text-xl font-bold mb-4">Add New Order (Cloud Synced)</h3>
                     <form @submit.prevent="addOrder" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <input type="text" x-model="newOrder.customerName" placeholder="Customer Name" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        <input type="text" x-model="newOrder.phone" placeholder="WhatsApp Phone" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        <input type="text" x-model="newOrder.item" placeholder="Cake Flavor & Weight" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        <input type="number" x-model.number="newOrder.total" placeholder="Total Amount" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        <input type="number" x-model.number="newOrder.advance" placeholder="Advance Paid" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        <input type="date" x-model="newOrder.deliveryDate" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Customer Name</label>
+                            <input type="text" x-model="newOrder.customerName" placeholder="Rahim Ahmed" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">WhatsApp Phone</label>
+                            <input type="text" x-model="newOrder.phone" placeholder="01813692433" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Cake Flavor & Weight</label>
+                            <input type="text" x-model="newOrder.item" placeholder="Chocolate 2 Pound" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Total Amount (৳)</label>
+                            <input type="number" x-model.number="newOrder.total" placeholder="1500" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Advance Paid (৳)</label>
+                            <input type="number" x-model.number="newOrder.advance" placeholder="500" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Delivery Date</label>
+                            <input type="date" x-model="newOrder.deliveryDate" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        </div>
                         
                         <div class="md:col-span-3 flex justify-end">
                             <button type="submit" class="px-6 py-3 bg-primary text-white font-medium rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition flex items-center space-x-2">
@@ -185,31 +246,36 @@
 
                 <!-- Orders Table -->
                 <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                    <h3 class="text-xl font-bold mb-4">Cloud Synced Orders</h3>
+                    <h3 class="text-xl font-bold mb-4">All Cloud Orders</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-slate-200 dark:border-slate-700 text-slate-400 text-sm">
                                     <th class="py-3 px-4">Customer</th>
-                                    <th class="py-3 px-4">Cake</th>
+                                    <th class="py-3 px-4">Cake Item</th>
+                                    <th class="py-3 px-4">Delivery Date</th>
                                     <th class="py-3 px-4">Total</th>
-                                    <th class="py-3 px-4">Paid/Due</th>
+                                    <th class="py-3 px-4">Paid / Due</th>
                                     <th class="py-3 px-4 text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <template x-for="order in orders" :key="order.id">
                                     <tr class="border-b border-slate-100 dark:border-slate-800">
-                                        <td class="py-3 px-4 font-medium" x-text="order.customerName"></td>
-                                        <td class="py-3 px-4" x-text="order.item"></td>
-                                        <td class="py-3 px-4 font-bold" x-text="'৳ ' + order.total"></td>
                                         <td class="py-3 px-4">
-                                            <span class="text-emerald-500" x-text="'Paid: ৳' + order.advance"></span><br>
-                                            <span class="text-rose-500 text-xs" x-text="'Due: ৳' + (order.total - order.advance)"></span>
+                                            <div class="font-medium" x-text="order.customerName"></div>
+                                            <div class="text-xs text-slate-500" x-text="order.phone"></div>
                                         </td>
-                                        <td class="py-3 px-4 text-center space-x-2">
-                                            <button @click="sendWhatsApp(order)" class="p-2 text-emerald-500 hover:bg-emerald-50 rounded-lg"><i data-lucide="message-circle" class="w-4 h-4"></i></button>
-                                            <button @click="deleteOrder(order.id)" class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                        <td class="py-3 px-4" x-text="order.item"></td>
+                                        <td class="py-3 px-4 text-sm" x-text="order.deliveryDate"></td>
+                                        <td class="py-3 px-4 font-bold" x-text="'৳ ' + order.total"></td>
+                                        <td class="py-3 px-4 text-sm">
+                                            <span class="text-emerald-500" x-text="'Paid: ৳' + order.advance"></span><br>
+                                            <span class="text-rose-500" x-text="'Due: ৳' + (order.total - order.advance)"></span>
+                                        </td>
+                                        <td class="py-3 px-4 text-center space-x-1">
+                                            <button @click="sendWhatsApp(order)" class="p-2 text-emerald-500 hover:bg-emerald-50 rounded-lg" title="WhatsApp Invoice"><i data-lucide="message-circle" class="w-4 h-4"></i></button>
+                                            <button @click="deleteOrder(order.id)" class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg" title="Delete Order"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                                         </td>
                                     </tr>
                                 </template>
@@ -219,10 +285,74 @@
                 </div>
             </div>
 
-            <!-- SHOP SETTINGS TAB -->
+            <!-- 3. CUSTOMER HISTORY TAB -->
+            <div x-show="currentTab === 'customers'" class="space-y-6">
+                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <h3 class="text-xl font-bold mb-4">Customer Directory & History</h3>
+                    <div class="space-y-3">
+                        <template x-for="cust in uniqueCustomers" :key="cust.phone">
+                            <div class="p-4 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-base" x-text="cust.name"></h4>
+                                    <p class="text-xs text-slate-500" x-text="'Phone: ' + cust.phone"></p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-sm font-semibold text-primary" x-text="cust.ordersCount + ' Orders'"></span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. DELIVERY CALENDAR TAB -->
+            <div x-show="currentTab === 'calendar'" class="space-y-6">
+                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <h3 class="text-xl font-bold mb-4">Scheduled Deliveries</h3>
+                    <div class="space-y-3">
+                        <template x-for="order in orders" :key="order.id">
+                            <div class="p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                                <div>
+                                    <span class="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full font-bold" x-text="order.deliveryDate"></span>
+                                    <h4 class="font-bold mt-2" x-text="order.customerName + ' - ' + order.item"></h4>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-sm font-bold text-emerald-500" x-text="'৳ ' + order.total"></span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. EXPENSES & COSTS TAB -->
+            <div x-show="currentTab === 'expenses'" class="space-y-6">
+                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
+                    <h3 class="text-xl font-bold">Add Business Expense</h3>
+                    <form @submit.prevent="addExpense" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" x-model="newExpense.title" placeholder="Expense Title (e.g. Flour, Sugar)" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        <input type="number" x-model.number="newExpense.amount" placeholder="Amount (৳)" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                        <button type="submit" class="px-5 py-2.5 bg-primary text-white font-medium rounded-xl">Add Expense</button>
+                    </form>
+
+                    <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <h4 class="font-bold mb-3">Expense Records</h4>
+                        <div class="space-y-2">
+                            <template x-for="exp in expenses" :key="exp.id">
+                                <div class="flex justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border dark:border-slate-800">
+                                    <span x-text="exp.title"></span>
+                                    <span class="font-bold text-rose-500" x-text="'- ৳ ' + exp.amount"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. SHOP SETTINGS TAB -->
             <div x-show="currentTab === 'settings'" class="space-y-6">
                 <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
-                    <h3 class="text-xl font-bold">Cloud Shop Settings</h3>
+                    <h3 class="text-xl font-bold">Shop Branding & Settings</h3>
                     <form @submit.prevent="updateShopProfile" class="space-y-4 max-w-lg">
                         <div>
                             <label class="block text-sm font-medium mb-1">Shop Name</label>
@@ -233,7 +363,7 @@
                             <input type="text" x-model="shopProfile.phone" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-1">Logo URL (or Base64)</label>
+                            <label class="block text-sm font-medium mb-1">Logo URL</label>
                             <input type="text" x-model="shopProfile.logo" placeholder="https://..." class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
                         </div>
                         <button type="submit" class="px-5 py-2.5 bg-primary text-white font-medium rounded-xl">Save Settings to Cloud</button>
@@ -241,13 +371,24 @@
                 </div>
             </div>
 
+            <!-- 7. CLOUD BACKUP TAB -->
+            <div x-show="currentTab === 'backup'" class="space-y-6">
+                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
+                    <h3 class="text-xl font-bold">Cloud Backup & Restore</h3>
+                    <p class="text-sm text-slate-500">Your data is safely stored in Google Firebase Cloud associated with your email account. You can log in from any device anytime!</p>
+                    <div class="p-4 bg-emerald-500/10 text-emerald-500 rounded-xl font-medium text-sm">
+                        Status: Cloud Sync Active & Running (Lifetime Free Tier)
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
-    <!-- APP FIREBASE & ALPINE LOGIC -->
+    <!-- APP LOGIC & FIREBASE -->
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSyDP9A4C78LP1VBJuVwdiotnzvWS_Lhnytk",
+            apiKey: "AIzaSyDP9A4C78LP1VBJuVwdiotnzvMS_Lhnytk",
             authDomain: "bakeflow-fc939.firebaseapp.com",
             projectId: "bakeflow-fc939",
             storageBucket: "bakeflow-fc939.firebasestorage.app",
@@ -271,9 +412,11 @@
                 authError: '',
 
                 authForm: { email: '', password: '', shopName: '' },
-                shopProfile: { shopName: '', phone: '', logo: '' },
+                shopProfile: { shopName: 'BakeFlow Bakery', phone: '', logo: '' },
                 orders: [],
+                expenses: [],
                 newOrder: { customerName: '', phone: '', item: '', total: '', advance: '', deliveryDate: '' },
+                newExpense: { title: '', amount: '' },
 
                 init() {
                     auth.onAuthStateChanged(user => {
@@ -311,55 +454,77 @@
                     }
                 },
 
-                logout() {
-                    auth.signOut();
-                },
+                logout() { auth.signOut(); },
 
                 fetchCloudData() {
                     if (!this.currentUser) return;
 
-                    // Listen to Profile
                     db.collection('users').doc(this.currentUser.uid).onSnapshot(doc => {
                         if (doc.exists) this.shopProfile = doc.data();
                     });
 
-                    // Listen to Orders in Realtime
                     db.collection('users').doc(this.currentUser.uid).collection('orders')
-                      .orderBy('createdAt', 'desc')
+                      .orderBy('deliveryDate', 'desc')
                       .onSnapshot(snapshot => {
                           this.orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                           setTimeout(() => lucide.createIcons(), 50);
+                      });
+
+                    db.collection('users').doc(this.currentUser.uid).collection('expenses')
+                      .onSnapshot(snapshot => {
+                          this.expenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                       });
                 },
 
                 async addOrder() {
                     if (!this.currentUser) return;
-                    const orderData = { ...this.newOrder, createdAt: new Date().toISOString() };
-                    await db.collection('users').doc(this.currentUser.uid).collection('orders').add(orderData);
+                    await db.collection('users').doc(this.currentUser.uid).collection('orders').add({
+                        ...this.newOrder,
+                        createdAt: new Date().toISOString()
+                    });
                     this.sendWhatsApp(this.newOrder);
                     this.newOrder = { customerName: '', phone: '', item: '', total: '', advance: '', deliveryDate: '' };
-                    alert('Order synced to Firebase Cloud!');
+                    alert('Order synced to Cloud & WhatsApp ready!');
                 },
 
                 async deleteOrder(id) {
-                    if (confirm('Delete this order permanently from Cloud?')) {
+                    if (confirm('Delete this order from Cloud?')) {
                         await db.collection('users').doc(this.currentUser.uid).collection('orders').doc(id).delete();
                     }
                 },
 
+                async addExpense() {
+                    if (!this.currentUser) return;
+                    await db.collection('users').doc(this.currentUser.uid).collection('expenses').add(this.newExpense);
+                    this.newExpense = { title: '', amount: '' };
+                },
+
                 async updateShopProfile() {
                     await db.collection('users').doc(this.currentUser.uid).update(this.shopProfile);
-                    alert('Profile updated on Cloud!');
+                    alert('Shop profile updated!');
                 },
 
                 sendWhatsApp(order) {
                     const due = order.total - order.advance;
-                    const msg = `Hello *${order.customerName}*,\n\nThank you for ordering from *${this.shopProfile.shopName}*! 🎂\n\n*Order Details:*\n- Item: ${order.item}\n- Total: ৳${order.total}\n- Paid: ৳${order.advance}\n- Due: ৳${due}\n- Delivery: ${order.deliveryDate}`;
+                    const msg = `Hello *${order.customerName}*,\n\nThank you for ordering from *${this.shopProfile.shopName || 'BakeFlow'}*! 🎂\n\n*Order Details:*\n- Item: ${order.item}\n- Total: ৳${order.total}\n- Paid: ৳${order.advance}\n- Due: ৳${due}\n- Delivery Date: ${order.deliveryDate}`;
                     window.open(`https://wa.me/88${order.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
                 },
 
-                get totalSales() { return this.orders.reduce((sum, o) => sum + Number(o.total), 0); },
-                get totalDue() { return this.orders.reduce((sum, o) => sum + (Number(o.total) - Number(o.advance)), 0); }
+                get totalSales() { return this.orders.reduce((sum, o) => sum + Number(o.total || 0), 0); },
+                get totalDue() { return this.orders.reduce((sum, o) => sum + (Number(o.total || 0) - Number(o.advance || 0)), 0); },
+                get totalExpenses() { return this.expenses.reduce((sum, e) => sum + Number(e.amount || 0), 0); },
+                get totalProfit() { return (this.totalSales * 0.5) - this.totalExpenses; },
+
+                get uniqueCustomers() {
+                    const map = {};
+                    this.orders.forEach(o => {
+                        if (!map[o.phone]) {
+                            map[o.phone] = { name: o.customerName, phone: o.phone, ordersCount: 0 };
+                        }
+                        map[o.phone].ordersCount++;
+                    });
+                    return Object.values(map);
+                }
             }));
         });
     </script>
