@@ -31,24 +31,57 @@
 </head>
 <body x-data="bakeFlowApp()" :class="darkMode ? 'dark bg-darkBg text-slate-100' : 'bg-slate-50 text-slate-800'" class="min-h-screen transition-colors duration-300">
 
+    <!-- Profile Setup Modal (If no profile exists) -->
+    <div x-show="!shopProfile.isSetup" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+        <div class="bg-white dark:bg-cardBg max-w-md w-full p-6 rounded-2xl shadow-2xl space-y-4">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto text-3xl mb-2">🧁</div>
+                <h2 class="text-2xl font-bold">Welcome to BakeFlow</h2>
+                <p class="text-sm text-slate-500">Setup your shop account to get started.</p>
+            </div>
+            <form @submit.prevent="saveProfile" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Shop / Business Name</label>
+                    <input type="text" x-model="tempProfile.shopName" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="e.g. Sweet Delights Bakery">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Owner Gmail</label>
+                    <input type="email" x-model="tempProfile.email" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="owner@gmail.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Phone Number (WhatsApp)</label>
+                    <input type="text" x-model="tempProfile.phone" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="018XXXXXXXX">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Shop Logo (Upload Image)</label>
+                    <input type="file" @change="handleLogoUpload" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
+                </div>
+                <button type="submit" class="w-full py-3 bg-primary text-white font-medium rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition">Save & Start Business</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Top Navigation / Header -->
     <header class="sticky top-0 z-40 bg-white dark:bg-cardBg shadow-sm border-b border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-3">
-            <!-- Hamburger Menu Button -->
             <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                 <i data-lucide="menu" class="w-6 h-6 text-primary"></i>
             </button>
             <div class="flex items-center space-x-2">
-                <div class="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-bold text-lg">🍰</div>
+                <template x-if="shopProfile.logo">
+                    <img :src="shopProfile.logo" class="w-9 h-9 rounded-xl object-cover border border-primary">
+                </template>
+                <template x-if="!shopProfile.logo">
+                    <div class="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-bold text-lg">🍰</div>
+                </template>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight">BakeFlow</h1>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Pro Bakery OS</p>
+                    <h1 class="font-bold text-base leading-tight" x-text="shopProfile.shopName || 'BakeFlow'"></h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400" x-text="shopProfile.phone || 'Pro Bakery OS'"></p>
                 </div>
             </div>
         </div>
 
         <div class="flex items-center space-x-2">
-            <!-- Dark/Light Mode Toggle -->
             <button @click="toggleDarkMode()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                 <i :data-lucide="darkMode ? 'sun' : 'moon'" class="w-5 h-5 text-amber-500"></i>
             </button>
@@ -57,10 +90,7 @@
 
     <!-- Sidebar Drawer -->
     <div x-show="sidebarOpen" class="fixed inset-0 z-50 flex">
-        <!-- Backdrop -->
         <div @click="sidebarOpen = false" class="fixed inset-0 bg-black/50 transition-opacity"></div>
-        
-        <!-- Sidebar Content -->
         <div class="relative w-72 bg-white dark:bg-cardBg h-full shadow-2xl flex flex-col z-10 p-5 space-y-6">
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-4">
                 <div class="flex items-center space-x-2">
@@ -93,6 +123,10 @@
                     <i data-lucide="receipt" class="w-5 h-5"></i>
                     <span>Expenses & Costs</span>
                 </button>
+                <button @click="currentTab = 'settings'; sidebarOpen = false" :class="currentTab === 'settings' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                    <span>Shop Settings</span>
+                </button>
                 <button @click="currentTab = 'backup'; sidebarOpen = false" :class="currentTab === 'backup' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
                     <i data-lucide="database" class="w-5 h-5"></i>
                     <span>Backup & Restore</span>
@@ -100,7 +134,7 @@
             </nav>
 
             <div class="border-t border-slate-200 dark:border-slate-700 pt-4 text-xs text-center text-slate-500">
-                BakeFlow v2.5 • PWA Ready
+                BakeFlow v3.0 • PWA Ready
             </div>
         </div>
     </div>
@@ -141,7 +175,6 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
             <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
                 <div>
                     <h3 class="text-lg font-bold">Quick New Order</h3>
@@ -200,7 +233,6 @@
                 </form>
             </div>
 
-            <!-- Orders List Table -->
             <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
                 <h3 class="text-xl font-bold mb-4">All Orders History</h3>
                 <div class="overflow-x-auto">
@@ -304,7 +336,7 @@
                 <form @submit.prevent="addExpense" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium mb-1">Expense Title</label>
-                        <input type="text" x-model="newExpense.title" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" placeholder="e.g. Flour, Chocolate, Delivery">
+                        <input type="text" x-model="newExpense.title" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900" placeholder="e.g. Flour, Chocolate">
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1">Amount (৳)</label>
@@ -332,17 +364,41 @@
             </div>
         </div>
 
-        <!-- 6. BACKUP & RESTORE TAB -->
+        <!-- 6. SHOP SETTINGS TAB -->
+        <div x-show="currentTab === 'settings'" class="space-y-6">
+            <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
+                <h3 class="text-xl font-bold">Shop Profile Settings</h3>
+                <form @submit.prevent="updateProfile" class="space-y-4 max-w-lg">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Shop / Business Name</label>
+                        <input type="text" x-model="shopProfile.shopName" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Owner Gmail</label>
+                        <input type="email" x-model="shopProfile.email" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Phone Number (WhatsApp)</label>
+                        <input type="text" x-model="shopProfile.phone" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Update Shop Logo</label>
+                        <input type="file" @change="handleLogoUpload" accept="image/*" class="w-full text-sm text-slate-500">
+                    </div>
+                    <button type="submit" class="px-5 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-primary/90 transition">Update Settings</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 7. BACKUP TAB -->
         <div x-show="currentTab === 'backup'" class="space-y-6">
             <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
                 <h3 class="text-xl font-bold">Data Backup & Restore</h3>
-                <p class="text-sm text-slate-500">Keep your bakery orders safe by exporting data as JSON file or restoring anytime.</p>
-                <div class="flex space-x-4">
-                    <button @click="exportData" class="px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition flex items-center space-x-2">
-                        <i data-lucide="download" class="w-5 h-5"></i>
-                        <span>Export Backup JSON</span>
-                    </button>
-                </div>
+                <p class="text-sm text-slate-500">Keep your bakery orders safe by exporting data as JSON file.</p>
+                <button @click="exportData" class="px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition flex items-center space-x-2">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    <span>Export Backup JSON</span>
+                </button>
             </div>
         </div>
 
@@ -356,6 +412,10 @@
                 sidebarOpen: false,
                 darkMode: true,
                 searchQuery: '',
+                
+                shopProfile: JSON.parse(localStorage.getItem('bakeflow_profile')) || { isSetup: false, shopName: '', email: '', phone: '', logo: '' },
+                tempProfile: { shopName: '', email: '', phone: '', logo: '' },
+                
                 orders: JSON.parse(localStorage.getItem('bakeflow_orders')) || [],
                 expenses: JSON.parse(localStorage.getItem('bakeflow_expenses')) || [],
                 
@@ -370,14 +430,37 @@
                     this.darkMode = !this.darkMode;
                 },
 
+                handleLogoUpload(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.tempProfile.logo = e.target.result;
+                            this.shopProfile.logo = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                },
+
+                saveProfile() {
+                    this.shopProfile.isSetup = true;
+                    this.shopProfile.shopName = this.tempProfile.shopName;
+                    this.shopProfile.email = this.tempProfile.email;
+                    this.shopProfile.phone = this.tempProfile.phone;
+                    localStorage.setItem('bakeflow_profile', JSON.stringify(this.shopProfile));
+                    alert('Shop profile created successfully!');
+                },
+
+                updateProfile() {
+                    localStorage.setItem('bakeflow_profile', JSON.stringify(this.shopProfile));
+                    alert('Shop settings updated successfully!');
+                },
+
                 addOrder() {
                     const order = { id: Date.now(), ...this.newOrder };
                     this.orders.unshift(order);
                     this.saveData();
-
-                    // Send WhatsApp message instantly regardless of payment state
                     this.sendWhatsApp(order);
-
                     this.newOrder = { customerName: '', phone: '', item: '', total: '', advance: '', cost: '', deliveryDate: '' };
                     this.currentTab = 'orders';
                     alert('Order saved successfully & WhatsApp message ready!');
@@ -409,7 +492,7 @@
 
                 sendWhatsApp(order) {
                     const due = order.total - order.advance;
-                    const msg = `Hello *${order.customerName}*,\n\nThank you for ordering with us! 🎂\n\n*Order Details:*\n- Item: ${order.item}\n- Total Amount: ৳${order.total}\n- Paid (Advance): ৳${order.advance}\n- Due Balance: ৳${due}\n- Delivery Date: ${order.deliveryDate}\n\nWe look forward to serving you the best taste! ✨`;
+                    const msg = `Hello *${order.customerName}*,\n\nThank you for ordering from *${this.shopProfile.shopName}*! 🎂\n\n*Order Details:*\n- Item: ${order.item}\n- Total: ৳${order.total}\n- Paid: ৳${order.advance}\n- Due: ৳${due}\n- Delivery: ${order.deliveryDate}\n\nContact: ${this.shopProfile.phone}`;
                     const url = `https://wa.me/88${order.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
                     window.open(url, '_blank');
                 },
@@ -418,18 +501,25 @@
                     const due = order.total - order.advance;
                     const printWindow = window.open('', '_print', 'width=400,height=600');
                     printWindow.document.write(`
-                        <html><head><title>Invoice</title><style>body{font-family:sans-serif;padding:20px;font-size:14px;}h2{text-align:center;color:#ea580c;}</style></head>
+                        <html><head><title>Invoice</title><style>body{font-family:sans-serif;padding:20px;font-size:14px;text-align:center;}h2{color:#ea580c;margin:5px 0;}</style></head>
                         <body>
-                            <h2>BakeFlow Bakery</h2>
-                            <p><b>Customer:</b> ${order.customerName}</p>
-                            <p><b>Phone:</b> ${order.phone}</p>
-                            <p><b>Item:</b> ${order.item}</p>
-                            <p><b>Delivery:</b> ${order.deliveryDate}</p>
+                            ${this.shopProfile.logo ? `<img src="${this.shopProfile.logo}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin:auto;">` : ''}
+                            <h2>${this.shopProfile.shopName}</h2>
+                            <p style="font-size:12px;color:#555;">Phone: ${this.shopProfile.phone} | Email: ${this.shopProfile.email}</p>
                             <hr>
-                            <p><b>Total:</b> ৳${order.total}</p>
-                            <p><b>Paid:</b> ৳${order.advance}</p>
-                            <p><b>Due:</b> ৳${due}</p>
-                            <hr><p style="text-align:center;">Thank you!</p>
+                            <div style="text-align:left;">
+                                <p><b>Customer:</b> ${order.customerName}</p>
+                                <p><b>Phone:</b> ${order.phone}</p>
+                                <p><b>Item:</b> ${order.item}</p>
+                                <p><b>Delivery:</b> ${order.deliveryDate}</p>
+                            </div>
+                            <hr>
+                            <div style="text-align:left;">
+                                <p><b>Total:</b> ৳${order.total}</p>
+                                <p><b>Paid:</b> ৳${order.advance}</p>
+                                <p><b>Due:</b> ৳${due}</p>
+                            </div>
+                            <hr><p style="font-size:12px;">Thank you for your business!</p>
                         </body></html>
                     `);
                     printWindow.document.close();
@@ -437,7 +527,7 @@
                 },
 
                 exportData() {
-                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({orders: this.orders, expenses: this.expenses}));
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({profile: this.shopProfile, orders: this.orders, expenses: this.expenses}));
                     const downloadAnchor = document.createElement('a');
                     downloadAnchor.setAttribute("href", dataStr);
                     downloadAnchor.setAttribute("download", "bakeflow_backup.json");
