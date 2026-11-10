@@ -24,7 +24,7 @@ tailwind.config={
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 function app(){
-const L=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+const L=(k,d)=>{try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):d}catch{return d}};
 const ymd=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const CH={};
 const blank=()=>({id:null,customerName:'',phone:'',date:ymd(new Date()),slot:'11:00 – 13:00',item:'',size:'',total:'',advance:'',method:'Cash',notes:'',status:'Received'});
@@ -44,14 +44,24 @@ stock:L('bf_stock',[{id:1,name:'Flour',qty:25,unit:'kg',min:10},{id:2,name:'Suga
 f:blank(),e:{title:'',category:'Ingredients',amount:''},s:{name:'',qty:'',unit:'kg',min:''},
 init(){
  this.logo=document.querySelector('link[rel=icon]').href;this.urlIn=this.url;
- if(this.isDark)document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');
- [['orders','bf_orders'],['expenses','bf_exp'],['stock','bf_stock'],['queue','bf_q'],['url','bf_url'],['shop_name','bf_shop_name'],['shop_logo','bf_shop_logo'],['bkash','bf_bkash'],['nagad','bf_nagad'],['rocket','bf_rocket'],['bank','bf_bank'],['dark','bf_dark']].forEach(([k,key])=>this.$watch(k,v=>{try{localStorage.setItem(key,JSON.stringify(v))}catch{}}));
- ['tab','orders','expenses','stock','drawer','shopName','shopLogo','bkashNo','nagadNo','rocketNo','bankInfo','isDark'].forEach(k=>this.$watch(k,()=>this.paint()));
+ this.applyTheme();
+ const keys=[
+  ['orders','bf_orders'],['expenses','bf_exp'],['stock','bf_stock'],
+  ['queue','bf_q'],['url','bf_url'],['shopName','bf_shop_name'],
+  ['shopLogo','bf_shop_logo'],['bkashNo','bf_bkash'],['nagadNo','bf_nagad'],
+  ['rocketNo','bf_rocket'],['bankInfo','bf_bank'],['isDark','bf_dark']
+ ];
+ keys.forEach(([k,key])=>this.$watch(k,v=>{try{localStorage.setItem(key,JSON.stringify(v))}catch(e){console.error(e)}}));
+ ['tab','orders','expenses','stock','drawer','shopName','shopLogo','bkashNo','nagadNo','rocketNo','bankInfo'].forEach(k=>this.$watch(k,()=>this.paint()));
  addEventListener('online',()=>this.flush());this.flush();this.paint();
+},
+applyTheme(){
+ if(this.isDark)document.documentElement.classList.add('dark');
+ else document.documentElement.classList.remove('dark');
 },
 toggleTheme(){
  this.isDark=!this.isDark;
- if(this.isDark)document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');
+ this.applyTheme();
  this.paint();
 },
 paint(){this.$nextTick(()=>{lucide.createIcons();if(this.tab==='dashboard')this.draw()})},
@@ -114,9 +124,25 @@ async flush(){if(!this.url||this.busy||!this.queue.length)return;this.busy=true;
  this.busy=false;if(n&&!this.queue.length)this.say('Synced to Google Sheet')},
 saveUrl(){const u=this.urlIn.trim();if(u&&!/^https:\/\/script\.google(usercontent)?\.com\//.test(u)){this.say('Use your Apps Script Web App URL (https://script.google.com/…)',1);return}
  this.url=u;this.say(u?'Cloud sync connected':'Using local storage only');this.flush()},
-handleLogoUpload(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();
- r.onload=()=>{this.shopLogo=r.target.result;this.say('Shop logo updated successfully!')};
- r.readAsDataURL(f)},
+handleLogoUpload(e){
+ const f=e.target.files[0];if(!f)return;
+ const img=new Image();
+ img.onload=()=>{
+  const canvas=document.createElement('canvas');
+  const maxDim=200;
+  let w=img.width,h=img.height;
+  if(w>h){if(w>maxDim){h*=maxDim/w;w=maxDim;}}
+  else{if(h>maxDim){w*=maxDim/h;h=maxDim;}}
+  canvas.width=w;canvas.height=h;
+  const ctx=canvas.getContext('2d');
+  ctx.drawImage(img,0,0,w,h);
+  this.shopLogo=canvas.toDataURL('image/png',0.8);
+  this.say('Shop logo updated and saved!');
+ };
+ const r=new FileReader();
+ r.onload=ev=>{img.src=ev.target.result};
+ r.readAsDataURL(f);
+},
 wa(o){let p=(o.phone||'').replace(/\D/g,'');if(!p){this.say('Add a WhatsApp number first',1);return}
  p=p.startsWith('880')?p:p.startsWith('0')?'88'+p:'880'+p;
  const sName=this.shopName||'BakeFlow OS';
