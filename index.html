@@ -1,532 +1,297 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BakeFlow Cloud - Smart Bakery OS</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#ea580c',
-                        darkBg: '#0f172a',
-                        cardBg: '#1e293b'
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Alpine.js CDN -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BakeFlow OS – Smart Bakery Management</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>tailwind.config={theme:{extend:{colors:{bg:'#0b0f19',card:'#111827',brand:'#f97316',em:'#10b981',am:'#f59e0b',ro:'#f43f5e'},fontFamily:{display:['Fraunces','Georgia','serif']}}}}</script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.54.1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+function app(){
+const L=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+const ymd=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const CH={};
+const blank=()=>({id:null,customerName:'',phone:'',date:ymd(new Date()),slot:'11:00 – 13:00',item:'',size:'',total:'',advance:'',method:'Cash',notes:'',status:'Received'});
+const hdr={'Content-Type':'text/plain;charset=utf-8'};
+return{
+tabs:[{id:'dashboard',label:'Dashboard',icon:'layout-dashboard'},{id:'orders',label:'POS & Orders',icon:'shopping-bag'},{id:'kitchen',label:'Kitchen Pipeline',icon:'chef-hat'},{id:'inventory',label:'Inventory',icon:'package'},{id:'expenses',label:'Expenses',icon:'receipt'},{id:'settings',label:'Settings',icon:'settings'}],
+stages:['Received','Baking','Decorating','Ready for Pickup','Delivered'],
+col:{Received:'#f59e0b',Baking:'#f97316',Decorating:'#f43f5e','Ready for Pickup':'#10b981',Delivered:'#9ca3af'},
+slots:['09:00 – 11:00','11:00 – 13:00','13:00 – 15:00','15:00 – 17:00','17:00 – 20:00'],
+cats:['Ingredients','Packaging','Utilities','Marketing'],
+tab:'dashboard',drawer:false,toast:null,q:'',busy:false,logo:'',
+orders:L('bf_orders',[]),expenses:L('bf_exp',[]),queue:L('bf_q',[]),url:L('bf_url',''),urlIn:'',
+stock:L('bf_stock',[{id:1,name:'Flour',qty:25,unit:'kg',min:10},{id:2,name:'Sugar',qty:15,unit:'kg',min:8},{id:3,name:'Butter',qty:8,unit:'kg',min:5},{id:4,name:'Cream',qty:12,unit:'L',min:6},{id:5,name:'Cake boxes',qty:60,unit:'pcs',min:30}]),
+f:blank(),e:{title:'',category:'Ingredients',amount:''},s:{name:'',qty:'',unit:'kg',min:''},
+init(){
+ this.logo=document.querySelector('link[rel=icon]').href;this.urlIn=this.url;
+ [['orders','bf_orders'],['expenses','bf_exp'],['stock','bf_stock'],['queue','bf_q'],['url','bf_url']].forEach(([k,key])=>this.$watch(k,v=>{try{localStorage.setItem(key,JSON.stringify(v))}catch{}}));
+ ['tab','orders','expenses','stock','drawer'].forEach(k=>this.$watch(k,()=>this.paint()));
+ addEventListener('online',()=>this.flush());this.flush();this.paint();
+},
+paint(){this.$nextTick(()=>{lucide.createIcons();if(this.tab==='dashboard')this.draw()})},
+say(m,err){this.toast={m,err};clearTimeout(this._t);this._t=setTimeout(()=>this.toast=null,3000)},
+reset(){this.f=blank()},
+go(t){this.tab=t;this.drawer=false;scrollTo({top:0})},
+fmt:n=>'৳'+Number(n||0).toLocaleString('en-IN'),
+due:o=>Math.max((+o.total||0)-(+o.advance||0),0),
+esc:s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
+dfmt:d=>d?new Date(d+'T00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'',
+get today(){return ymd(new Date())},
+get rev(){return this.orders.reduce((a,o)=>a+o.total,0)},
+get spent(){return this.expenses.reduce((a,x)=>a+x.amount,0)},
+get owed(){return this.orders.reduce((a,o)=>a+this.due(o),0)},
+get active(){return this.orders.filter(o=>o.status!=='Delivered')},
+get todays(){return this.orders.filter(o=>o.date===this.today&&o.status!=='Delivered')},
+get list(){const q=this.q.toLowerCase();return this.orders.filter(o=>!q||[o.customerName,o.item,o.inv,o.phone].join(' ').toLowerCase().includes(q))},
+get metrics(){return[
+{l:'Total revenue',v:this.fmt(this.rev),s:this.orders.length+' orders booked',i:'wallet',c:'#f97316'},
+{l:'Net profit',v:this.fmt(this.rev-this.spent),s:'Revenue minus expenses',i:'trending-up',c:'#10b981'},
+{l:'Total orders',v:this.orders.length,s:this.active.length+' still active',i:'shopping-bag',c:'#f59e0b'},
+{l:'Pending due',v:this.fmt(this.owed),s:'To collect from customers',i:'hourglass',c:'#f43f5e'}]},
+draw(){
+ const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return ymd(d)});
+ const sales=days.map(d=>this.orders.filter(o=>o.day===d).reduce((a,o)=>a+o.total,0));
+ const prof=days.map((d,i)=>sales[i]-this.expenses.filter(x=>x.day===d).reduce((a,x)=>a+x.amount,0));
+ const pay=['Cash','bKash','Nagad'].map(m=>this.orders.filter(o=>o.method===m).reduce((a,o)=>a+o.advance,0));
+ const b={chart:{foreColor:'#9ca3af',toolbar:{show:false},background:'transparent',fontFamily:'DM Sans, sans-serif',height:280},grid:{borderColor:'rgba(255,255,255,.06)'},theme:{mode:'dark'},dataLabels:{enabled:false}};
+ const o1={...b,chart:{...b.chart,type:'area'},series:[{name:'Sales',data:sales},{name:'Profit',data:prof}],xaxis:{categories:days.map(d=>d.slice(5))},colors:['#f97316','#10b981'],stroke:{curve:'smooth',width:3},fill:{type:'gradient',gradient:{opacityFrom:.4,opacityTo:.02}},legend:{position:'top',horizontalAlign:'right'},yaxis:{labels:{formatter:v=>Math.round(v)}}};
+ const o2={...b,chart:{...b.chart,type:'donut'},series:pay,labels:['Cash','bKash','Nagad'],colors:['#10b981','#f43f5e','#f59e0b'],stroke:{colors:['#111827']},legend:{position:'bottom'},noData:{text:'No payments yet'},plotOptions:{pie:{donut:{size:'68%',labels:{show:true,total:{show:true,label:'Collected',formatter:w=>this.fmt(w.globals.seriesTotals.reduce((a,c)=>a+c,0))}}}}}};
+ for(const [k,sel,o] of [['t','#trend',o1],['p','#pay',o2]]){if(CH[k])CH[k].updateOptions(o);else{CH[k]=new ApexCharts(document.querySelector(sel),o);CH[k].render()}}
+},
+save(keep){
+ const f=this.f;
+ if(!f.customerName.trim()||!f.item.trim()||!(+f.total>0)){this.say('Add customer name, item and total price first',1);return null}
+ const o={...f,customerName:f.customerName.trim(),item:f.item.trim(),total:+f.total,advance:Math.min(+f.advance||0,+f.total)};
+ const isNew=!o.id;
+ if(isNew){o.id=Date.now();o.inv='BF-'+(Math.max(1000,...this.orders.map(x=>+String(x.inv).slice(3)||0))+1);o.day=this.today;this.orders.unshift(o)}
+ else this.orders.splice(this.orders.findIndex(x=>x.id===o.id),1,o);
+ if(isNew||!keep)this.sync({type:'order',customerName:o.customerName,phone:o.phone,item:o.item,total:o.total,advance:o.advance});
+ this.f=keep?{...o}:blank();
+ if(!keep)this.say('Order '+o.inv+' saved');
+ return this.orders.find(x=>x.id===o.id);
+},
+act(k){const o=this.save(true);if(o)this[k](o)},
+edit(o){this.f={...o};this.tab='orders';scrollTo({top:0,behavior:'smooth'})},
+del(o){if(confirm('Delete order '+o.inv+'?'))this.orders=this.orders.filter(x=>x.id!==o.id)},
+move(o,d){const i=this.stages.indexOf(o.status)+d;if(i>=0&&i<this.stages.length)o.status=this.stages[i]},
+addExp(){const e=this.e;if(!e.title.trim()||!(+e.amount>0)){this.say('Add a title and an amount',1);return}
+ const x={id:Date.now(),title:e.title.trim(),category:e.category,amount:+e.amount,day:this.today};
+ this.expenses.unshift(x);this.sync({type:'expense',title:x.title,amount:x.amount});this.e={title:'',category:e.category,amount:''};this.say('Expense logged')},
+addStock(){const s=this.s;if(!s.name.trim()||s.qty===''){this.say('Add an item name and quantity',1);return}
+ this.stock.push({id:Date.now(),name:s.name.trim(),qty:+s.qty,unit:s.unit,min:+s.min||0});this.s={name:'',qty:'',unit:s.unit,min:''}},
+adj(i,d){i.qty=Math.max(0,Math.round((i.qty+d)*100)/100)},
+async sync(p){if(!this.url)return;this.queue.push(p);await this.flush()},
+async flush(){if(!this.url||this.busy||!this.queue.length)return;this.busy=true;let n=0;
+ while(this.queue.length){try{await fetch(this.url,{method:'POST',mode:'no-cors',headers:hdr,body:JSON.stringify(this.queue[0])});this.queue.shift();n++}catch{this.say('Offline – '+this.queue.length+' change(s) will sync later',1);break}}
+ this.busy=false;if(n&&!this.queue.length)this.say('Synced to Google Sheet')},
+saveUrl(){const u=this.urlIn.trim();if(u&&!/^https:\/\/script\.google(usercontent)?\.com\//.test(u)){this.say('Use your Apps Script Web App URL (https://script.google.com/…)',1);return}
+ this.url=u;this.say(u?'Cloud sync connected':'Using local storage only');this.flush()},
+wa(o){let p=(o.phone||'').replace(/\D/g,'');if(!p){this.say('Add a WhatsApp number first',1);return}
+ p=p.startsWith('880')?p:p.startsWith('0')?'88'+p:'880'+p;
+ const m=`*BakeFlow OS – Invoice ${o.inv}*\n\nHello ${o.customerName}! 🎂 Thank you for your order.\n\n*Item:* ${o.item}${o.size?' ('+o.size+')':''}\n*Delivery:* ${this.dfmt(o.date)}, ${o.slot}\n*Total:* ${this.fmt(o.total)}\n*Advance paid:* ${this.fmt(o.advance)} (${o.method})\n*Due balance:* ${this.fmt(this.due(o))}${o.notes?'\n*Notes:* '+o.notes:''}\n\nWe will see you soon!`;
+ window.open('https://wa.me/'+p+'?text='+encodeURIComponent(m),'_blank')},
+invHTML(o){const e=this.esc,d=this.due(o),td='padding:10px;border-bottom:1px solid #eee';
+ return`<div style="font:14px/1.5 Helvetica,Arial,sans-serif;color:#111;width:700px;padding:6px">
+<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #f97316;padding-bottom:14px">
+<div style="display:flex;align-items:center;gap:12px"><img src="${this.logo}" width="48" height="48"><div><div style="font-size:24px;font-weight:800">BakeFlow OS</div><div style="color:#777;font-size:12px">Fresh bakes, made to order</div></div></div>
+<div style="text-align:right"><div style="font-size:22px;font-weight:800;color:#f97316">Invoice</div><div>${e(o.inv)}</div><div style="color:#777;font-size:12px">Issued ${this.dfmt(o.day)}</div></div></div>
+<div style="margin:20px 0"><b>Billed to</b><br>${e(o.customerName)}<br>${e(o.phone)}</div>
+<table style="width:100%;border-collapse:collapse"><tr style="background:#fff3e8;text-align:left"><th style="${td}">Item</th><th style="${td}">Size</th><th style="${td}">Delivery</th><th style="${td};text-align:right">Amount</th></tr>
+<tr><td style="${td}">${e(o.item)}</td><td style="${td}">${e(o.size)||'–'}</td><td style="${td}">${this.dfmt(o.date)}<br>${e(o.slot)}</td><td style="${td};text-align:right">${this.fmt(o.total)}</td></tr></table>
+<div style="margin:18px 0 0 auto;width:280px"><div style="display:flex;justify-content:space-between;padding:4px 0"><span>Advance paid (${e(o.method)})</span><b>${this.fmt(o.advance)}</b></div>
+<div style="display:flex;justify-content:space-between;padding:8px 0;border-top:2px solid #111;font-size:17px"><b>Balance due</b><b style="color:${d?'#e11d48':'#059669'}">${d?this.fmt(d):'PAID IN FULL'}</b></div></div>
+${o.notes?`<div style="margin-top:18px;padding:12px;background:#f7f7f7;border-radius:8px"><b>Customization notes</b><br>${e(o.notes)}</div>`:''}
+<p style="margin-top:36px;text-align:center;color:#777;font-size:12px">Thank you for choosing BakeFlow OS. Please keep this invoice for pickup.</p></div>`},
+pdf(o){const d=document.createElement('div');d.innerHTML=this.invHTML(o);
+ html2pdf().set({margin:10,filename:o.inv+'.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4'}}).from(d.firstElementChild).save().then(()=>this.say('Invoice '+o.inv+' downloaded'))},
+kitchen(o){const w=window.open('','_blank','width=380,height=620');if(!w){this.say('Allow pop-ups to print the kitchen receipt',1);return}const e=this.esc;
+ w.document.write(`<html><head><title>${e(o.inv)}</title><style>body{font:13px/1.4 monospace;width:72mm;margin:0 auto;padding:8px}h1{font-size:17px;text-align:center;margin:0}hr{border:0;border-top:1px dashed #000;margin:8px 0}.b{font-size:16px;font-weight:bold}</style></head><body><h1>KITCHEN TOKEN</h1><div style="text-align:center">${e(o.inv)} · ${e(o.status)}</div><hr><div class="b">${e(o.item)}</div><div>Size: ${e(o.size)||'–'}</div><hr><div class="b">Deliver ${this.dfmt(o.date)}</div><div class="b">${e(o.slot)}</div><hr><div>Customer: ${e(o.customerName)}</div><div>Phone: ${e(o.phone)||'–'}</div><div>Balance due: ${this.fmt(this.due(o))}</div><hr><div>Notes:</div><div class="b">${e(o.notes)||'None'}</div></body></html>`);
+ w.document.close();w.focus();setTimeout(()=>w.print(),300)},
+dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1e3)},
+expJSON(){this.dl('bakeflow-backup-'+this.today+'.json',JSON.stringify({orders:this.orders,expenses:this.expenses,stock:this.stock},null,2),'application/json')},
+expCSV(){const k=['inv','day','customerName','phone','item','size','date','slot','total','advance','method','status','notes'];
+ const c=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+ this.dl('bakeflow-orders-'+this.today+'.csv',[k.join(','),...this.orders.map(o=>k.map(x=>c(o[x])).join(','))].join('\n'),'text/csv')},
+impJSON(ev){const file=ev.target.files[0];if(!file)return;const r=new FileReader();
+ r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.orders)||!Array.isArray(d.expenses))throw 0;
+  if(!confirm('Replace current data with this backup?'))return;this.orders=d.orders;this.expenses=d.expenses;if(Array.isArray(d.stock))this.stock=d.stock;this.say('Backup restored')}catch{this.say('That file is not a BakeFlow backup',1)}ev.target.value=''};
+ r.readAsText(file)}
+}}
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+<style type="text/tailwindcss">
+@layer base{body{font-family:'DM Sans',system-ui,sans-serif;background:#0b0f19;color:#e5e7eb}}
+@layer components{
+.card{@apply rounded-2xl border border-white/5 bg-card/80 backdrop-blur-xl shadow-xl shadow-black/20}
+.inp{@apply w-full rounded-xl border border-white/10 bg-bg/70 px-3 py-2.5 text-sm text-gray-100 placeholder-gray-500 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/30}
+.lbl{@apply mb-1 block text-xs font-medium text-gray-400}
+.btn{@apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand}
+.btn-p{@apply btn bg-brand text-white shadow-lg shadow-brand/30 hover:bg-orange-600}
+.btn-e{@apply btn bg-em text-white shadow-lg shadow-em/20 hover:bg-emerald-600}
+.btn-g{@apply btn border border-white/10 bg-white/5 text-gray-200 hover:bg-white/10}
+.nav{@apply flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-white}
+.nav.on{@apply bg-brand/15 text-brand ring-1 ring-brand/30}
+}
+[x-cloak]{display:none!important}
+.glow{box-shadow:0 0 28px -8px var(--g)}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.tab{animation:up .3s ease both}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(40% 30% at 12% 8%,rgba(249,115,22,.13),transparent),radial-gradient(35% 30% at 92% 85%,rgba(16,185,129,.08),transparent);pointer-events:none;z-index:-1}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
 </head>
-<body x-data="bakeFlowCloud()" :class="darkMode ? 'dark bg-darkBg text-slate-100' : 'bg-slate-50 text-slate-800'" class="min-h-screen transition-colors duration-300">
+<body x-data="app()" class="min-h-screen">
 
-    <!-- AUTHENTICATION MODAL (LOGIN / SIGNUP) -->
-    <div x-show="!currentUser" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-        <div class="bg-white dark:bg-cardBg max-w-md w-full p-6 rounded-2xl shadow-2xl space-y-4">
-            <div class="text-center">
-                <div class="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto text-3xl mb-2">🧁</div>
-                <h2 class="text-2xl font-bold" x-text="isSignUp ? 'Create Cloud Account' : 'Welcome Back'"></h2>
-                <p class="text-sm text-slate-500">Access your bakery business from any device worldwide.</p>
-            </div>
+<header class="fixed inset-x-0 top-0 z-50 flex h-16 items-center gap-3 border-b border-white/5 bg-bg/80 px-4 backdrop-blur-xl">
+ <button class="btn-g !p-2 lg:hidden" @click="drawer=!drawer" aria-label="Menu"><i data-lucide="menu" class="h-5 w-5"></i></button>
+ <img src="data:image/png;base64,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" alt="BakeFlow OS logo" width="36" height="36" class="h-9 w-9 rounded-xl bg-white object-contain p-0.5 ring-2 ring-brand/40">
+ <div class="leading-tight"><p class="font-display text-lg font-extrabold">BakeFlow <span class="text-brand">OS</span></p><p class="hidden text-[11px] text-gray-500 sm:block">Smart bakery management</p></div>
+ <div class="ml-auto flex items-center gap-3">
+  <span class="hidden items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold sm:flex" :class="url?'bg-em/15 text-em':'bg-white/5 text-gray-400'"><i :data-lucide="url?'cloud':'cloud-off'" class="h-3.5 w-3.5"></i><span x-text="url?'Cloud Sync Connected':'Local Storage Only'"></span></span>
+  <button class="btn-p !py-2" @click="reset();go('orders')"><i data-lucide="plus" class="h-4 w-4"></i><span class="hidden sm:inline">New order</span></button>
+ </div>
+</header>
 
-            <form @submit.prevent="handleAuth" class="space-y-4">
-                <template x-if="isSignUp">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Bakery / Business Name</label>
-                        <input type="text" x-model="authForm.shopName" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="Sweet Delights Bakery">
-                    </div>
-                </template>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Email Address</label>
-                    <input type="email" x-model="authForm.email" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="owner@gmail.com">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Password</label>
-                    <input type="password" x-model="authForm.password" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:border-primary" placeholder="••••••••">
-                </div>
+<div x-show="drawer" x-cloak x-transition.opacity @click="drawer=false" class="fixed inset-0 z-30 bg-black/60 lg:hidden"></div>
+<aside :class="drawer?'translate-x-0':'-translate-x-full'" class="fixed bottom-0 left-0 top-16 z-40 flex w-64 transform flex-col border-r border-white/5 bg-card/95 p-4 backdrop-blur-xl transition-transform duration-300 lg:translate-x-0">
+ <nav class="space-y-1">
+  <template x-for="t in tabs" :key="t.id"><button class="nav" :class="{on:tab===t.id}" @click="go(t.id)"><i :data-lucide="t.icon" class="h-4 w-4"></i><span x-text="t.label"></span><span x-show="t.id==='kitchen'&&active.length" class="ml-auto rounded-full bg-brand px-2 text-[11px] font-bold text-white" x-text="active.length"></span></button></template>
+ </nav>
+ <div class="mt-auto rounded-xl border border-white/5 bg-bg/60 p-3 text-xs text-gray-400"><p class="font-semibold text-gray-200" x-text="url?'Cloud Sync Connected':'Local Storage Only'"></p><p class="mt-1" x-text="queue.length?queue.length+' change(s) waiting to sync':'Data is saved in this browser.'"></p></div>
+</aside>
 
-                <div x-show="authError" class="text-rose-500 text-xs font-semibold text-center" x-text="authError"></div>
+<main class="p-4 pt-24 lg:pl-72 lg:pr-8">
 
-                <button type="submit" class="w-full py-3 bg-primary text-white font-medium rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition" x-text="isLoading ? 'Connecting Cloud...' : (isSignUp ? 'Create Account' : 'Login to App')"></button>
-            </form>
+<!-- Dashboard -->
+<section x-show="tab==='dashboard'" x-cloak class="tab space-y-6">
+ <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
+  <template x-for="m in metrics" :key="m.l"><div class="card glow p-4 lg:p-5" :style="'--g:'+m.c">
+   <div class="flex items-center justify-between"><span class="text-sm text-gray-400" x-text="m.l"></span><span class="grid h-9 w-9 place-items-center rounded-xl" :style="`background:${m.c}22;color:${m.c}`"><i :data-lucide="m.i" class="h-4 w-4"></i></span></div>
+   <p class="mt-3 font-display text-2xl font-extrabold lg:text-3xl" x-text="m.v"></p><p class="mt-1 text-xs text-gray-500" x-text="m.s"></p></div></template>
+ </div>
+ <div class="grid gap-4 lg:grid-cols-3">
+  <div class="card p-5 lg:col-span-2"><h2 class="font-display text-lg font-semibold">Sales and profit, last 7 days</h2><div id="trend" class="mt-2"></div></div>
+  <div class="card p-5"><h2 class="font-display text-lg font-semibold">Payments collected</h2><div id="pay" class="mt-2"></div></div>
+ </div>
+ <div class="grid gap-4 lg:grid-cols-3">
+  <div class="card glow p-5" style="--g:#f97316"><p class="text-sm text-gray-400">Active orders</p><p class="mt-2 font-display text-4xl font-extrabold text-brand" x-text="active.length"></p><button class="btn-g mt-4 w-full" @click="go('kitchen')">Open kitchen pipeline</button></div>
+  <div class="card p-5 lg:col-span-2"><h2 class="font-display text-lg font-semibold">Deliveries today</h2>
+   <p x-show="!todays.length" class="mt-3 text-sm text-gray-500">Nothing is due today. Orders with today’s delivery date appear here.</p>
+   <div class="mt-3 space-y-2"><template x-for="o in todays" :key="o.id"><div class="flex items-center justify-between gap-3 rounded-xl bg-bg/50 p-3"><div><p class="font-semibold" x-text="o.customerName+' – '+o.item"></p><p class="text-xs text-gray-400" x-text="o.slot+' · '+o.status"></p></div><div class="flex gap-2"><span class="self-center text-xs font-semibold" :class="due(o)?'text-ro':'text-em'" x-text="due(o)?'Due '+fmt(due(o)):'Paid'"></span><button class="btn-e !px-2.5 !py-2" @click="wa(o)" title="WhatsApp"><i data-lucide="message-circle" class="h-4 w-4"></i></button></div></div></template></div>
+  </div>
+ </div>
+</section>
 
-            <div class="text-center text-sm text-slate-500 pt-2">
-                <span x-text="isSignUp ? 'Already have an account?' : 'New bakery owner?'"></span>
-                <button @click="isSignUp = !isSignUp; authError=''" class="text-primary font-bold ml-1 underline" x-text="isSignUp ? 'Login here' : 'Register here'"></button>
-            </div>
-        </div>
-    </div>
+<!-- POS & Orders -->
+<section x-show="tab==='orders'" x-cloak class="tab space-y-6">
+ <div class="card p-5 lg:p-6">
+  <div class="mb-4 flex items-center justify-between"><h2 class="font-display text-xl font-semibold" x-text="f.id?'Edit order '+f.inv:'New order'"></h2></div>
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+   <div><label class="lbl">Customer name</label><input class="inp" x-model="f.customerName" placeholder="Nusrat Jahan"></div>
+   <div><label class="lbl">Phone (WhatsApp)</label><input class="inp" x-model="f.phone" inputmode="tel" placeholder="01XXXXXXXXX"></div>
+   <div><label class="lbl">Item name</label><input class="inp" x-model="f.item" placeholder="Red velvet cake"></div>
+   <div><label class="lbl">Delivery date</label><input type="date" class="inp" x-model="f.date"></div>
+   <div><label class="lbl">Time slot</label><select class="inp" x-model="f.slot"><template x-for="s in slots" :key="s"><option :value="s" x-text="s"></option></template></select></div>
+   <div><label class="lbl">Weight / size</label><input class="inp" x-model="f.size" placeholder="2 lb, 8 inch"></div>
+   <div><label class="lbl">Total price (৳)</label><input type="number" min="0" class="inp" x-model="f.total"></div>
+   <div><label class="lbl">Advance paid (৳)</label><input type="number" min="0" class="inp" x-model="f.advance"></div>
+   <div><label class="lbl">Order status</label><select class="inp" x-model="f.status"><template x-for="s in stages" :key="s"><option :value="s" x-text="s"></option></template></select></div>
+   <div class="sm:col-span-2 lg:col-span-3"><label class="lbl">Payment method</label><div class="grid max-w-md grid-cols-3 gap-2"><template x-for="m in ['Cash','bKash','Nagad']" :key="m"><button type="button" @click="f.method=m" class="rounded-xl border py-2.5 text-sm font-semibold transition" :class="f.method===m?'border-brand bg-brand/15 text-brand':'border-white/10 text-gray-400 hover:bg-white/5'" x-text="m"></button></template></div></div>
+   <div class="sm:col-span-2 lg:col-span-3"><label class="lbl">Customization notes</label><textarea rows="2" class="inp" x-model="f.notes" placeholder="Message on cake, flavour, allergies, colour theme"></textarea></div>
+  </div>
+  <div class="mt-5 flex items-center justify-between rounded-xl border border-white/5 bg-bg/60 px-4 py-3"><span class="text-sm text-gray-400">Remaining due</span><span class="font-display text-2xl font-extrabold" :class="due(f)?'text-ro':'text-em'" x-text="fmt(due(f))"></span></div>
+  <div class="mt-5 flex flex-wrap gap-3">
+   <button class="btn-p" @click="save()"><i data-lucide="save" class="h-4 w-4"></i>Save order</button>
+   <button class="btn-g" @click="act('pdf')"><i data-lucide="file-down" class="h-4 w-4"></i>Generate PDF invoice</button>
+   <button class="btn-g" @click="act('kitchen')"><i data-lucide="printer" class="h-4 w-4"></i>Print kitchen receipt</button>
+   <button class="btn-e" @click="act('wa')"><i data-lucide="message-circle" class="h-4 w-4"></i>Send WhatsApp invoice</button>
+   <button class="btn-g" @click="reset()"><i data-lucide="plus" class="h-4 w-4"></i>Clear form</button>
+  </div>
+ </div>
+ <div class="card p-5 lg:p-6">
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-3"><h2 class="font-display text-xl font-semibold">All orders</h2><input class="inp !w-full sm:!w-72" x-model="q" placeholder="Search name, item, invoice or phone"></div>
+  <p x-show="!list.length" class="py-8 text-center text-sm text-gray-500">No orders yet. Fill in the form above and save your first order.</p>
+  <div class="space-y-3"><template x-for="o in list" :key="o.id"><div class="rounded-xl border border-white/5 bg-bg/40 p-4 transition hover:border-brand/30">
+   <div class="flex flex-wrap items-start justify-between gap-3">
+    <div><p class="text-xs text-gray-500" x-text="o.inv+' · '+dfmt(o.date)+' · '+o.slot"></p><p class="font-bold" x-text="o.customerName"></p><p class="text-sm text-gray-400" x-text="o.item+(o.size?' · '+o.size:'')"></p></div>
+    <div class="text-right"><p class="font-display text-lg font-extrabold" x-text="fmt(o.total)"></p><p class="text-xs font-semibold" :class="due(o)?'text-ro':'text-em'" x-text="due(o)?'Due '+fmt(due(o)):'Fully paid'"></p></div>
+   </div>
+   <div class="mt-3 flex flex-wrap items-center gap-2">
+    <select class="inp !w-auto !py-1.5 text-xs font-semibold" :style="`color:${col[o.status]}`" x-model="o.status"><template x-for="s in stages" :key="s"><option :value="s" x-text="s"></option></template></select>
+    <button class="btn-g !px-2.5 !py-2" title="PDF invoice" @click="pdf(o)"><i data-lucide="file-down" class="h-4 w-4"></i></button>
+    <button class="btn-g !px-2.5 !py-2" title="Kitchen receipt" @click="kitchen(o)"><i data-lucide="printer" class="h-4 w-4"></i></button>
+    <button class="btn-g !px-2.5 !py-2 text-em" title="WhatsApp invoice" @click="wa(o)"><i data-lucide="message-circle" class="h-4 w-4"></i></button>
+    <button class="btn-g !px-2.5 !py-2" title="Edit" @click="edit(o)"><i data-lucide="pencil" class="h-4 w-4"></i></button>
+    <button x-show="due(o)" class="btn-g !px-3 !py-2 text-xs text-am" @click="o.advance=o.total">Mark paid</button>
+    <button class="btn-g !px-2.5 !py-2 text-ro" title="Delete" @click="del(o)"><i data-lucide="trash-2" class="h-4 w-4"></i></button>
+   </div></div></template></div>
+ </div>
+</section>
 
-    <!-- MAIN APP CONTENT -->
-    <div x-show="currentUser">
-        
-        <!-- Header -->
-        <header class="sticky top-0 z-40 bg-white dark:bg-cardBg shadow-sm border-b border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-                    <i data-lucide="menu" class="w-6 h-6 text-primary"></i>
-                </button>
-                <div class="flex items-center space-x-2">
-                    <template x-if="shopProfile.logo">
-                        <img :src="shopProfile.logo" class="w-9 h-9 rounded-xl object-cover border border-primary">
-                    </template>
-                    <template x-if="!shopProfile.logo">
-                        <div class="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-bold text-lg">🍰</div>
-                    </template>
-                    <div>
-                        <h1 class="font-bold text-base leading-tight" x-text="shopProfile.shopName || 'BakeFlow Cloud'"></h1>
-                        <p class="text-xs text-slate-500 dark:text-slate-400" x-text="currentUser ? currentUser.email : ''"></p>
-                    </div>
-                </div>
-            </div>
+<!-- Kitchen pipeline -->
+<section x-show="tab==='kitchen'" x-cloak class="tab">
+ <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+  <template x-for="st in stages" :key="st"><div class="card p-3">
+   <div class="mb-3 flex items-center justify-between px-1"><span class="flex items-center gap-2 text-sm font-bold"><span class="h-2.5 w-2.5 rounded-full" :style="'background:'+col[st]"></span><span x-text="st"></span></span><span class="rounded-full bg-white/5 px-2 text-xs" x-text="orders.filter(o=>o.status===st).length"></span></div>
+   <p x-show="!orders.some(o=>o.status===st)" class="px-1 py-4 text-xs text-gray-600">Empty</p>
+   <div class="space-y-2"><template x-for="o in orders.filter(o=>o.status===st)" :key="o.id"><div class="rounded-xl border border-white/5 bg-bg/60 p-3 text-sm">
+    <p class="text-xs text-gray-500" x-text="o.inv+' · '+dfmt(o.date)+', '+o.slot"></p>
+    <p class="font-bold" x-text="o.item"></p><p class="text-xs text-gray-400" x-text="o.customerName+(o.size?' · '+o.size:'')"></p>
+    <p x-show="o.notes" class="mt-2 rounded-lg bg-am/10 p-2 text-xs text-am" x-text="o.notes"></p>
+    <div class="mt-3 flex gap-1.5"><button class="btn-g !px-2 !py-1.5" :disabled="st===stages[0]" :class="st===stages[0]&&'opacity-30'" @click="move(o,-1)" title="Previous stage"><i data-lucide="chevron-left" class="h-4 w-4"></i></button><button class="btn-g !px-2 !py-1.5" @click="kitchen(o)" title="Print token"><i data-lucide="printer" class="h-4 w-4"></i></button><button class="btn-p ml-auto !px-3 !py-1.5 text-xs" x-show="st!==stages[4]" @click="move(o,1)">Next<i data-lucide="chevron-right" class="h-4 w-4"></i></button></div>
+   </div></template></div>
+  </div></template>
+ </div>
+</section>
 
-            <div class="flex items-center space-x-2">
-                <button @click="toggleDarkMode()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-                    <i :data-lucide="darkMode ? 'sun' : 'moon'" class="w-5 h-5 text-amber-500"></i>
-                </button>
-                <button @click="logout()" title="Logout Account" class="p-2 rounded-lg hover:bg-rose-100 text-rose-500 transition">
-                    <i data-lucide="log-out" class="w-5 h-5"></i>
-                </button>
-            </div>
-        </header>
+<!-- Inventory -->
+<section x-show="tab==='inventory'" x-cloak class="tab space-y-6">
+ <div class="card p-5"><h2 class="mb-4 font-display text-xl font-semibold">Add ingredient or supply</h2>
+  <div class="grid gap-3 sm:grid-cols-5"><input class="inp sm:col-span-2" x-model="s.name" placeholder="Item name"><input type="number" min="0" class="inp" x-model="s.qty" placeholder="Quantity"><select class="inp" x-model="s.unit"><option>kg</option><option>g</option><option>L</option><option>pcs</option></select><input type="number" min="0" class="inp" x-model="s.min" placeholder="Low-stock level"></div>
+  <button class="btn-p mt-4" @click="addStock()"><i data-lucide="plus" class="h-4 w-4"></i>Add to stock</button></div>
+ <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+  <template x-for="i in stock" :key="i.id"><div class="card p-4" :class="i.qty<=i.min&&'!border-ro/40'">
+   <div class="flex items-start justify-between"><div><p class="font-bold" x-text="i.name"></p><p class="text-xs" :class="i.qty<=i.min?'text-ro':'text-gray-500'" x-text="i.qty<=i.min?'Low stock – reorder soon':'Low-stock level: '+i.min+' '+i.unit"></p></div><button class="text-gray-500 hover:text-ro" title="Remove" @click="stock=stock.filter(x=>x.id!==i.id)"><i data-lucide="trash-2" class="h-4 w-4"></i></button></div>
+   <p class="mt-3 font-display text-3xl font-extrabold" :class="i.qty<=i.min?'text-ro':'text-em'"><span x-text="i.qty"></span> <span class="text-base font-semibold text-gray-400" x-text="i.unit"></span></p>
+   <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10"><div class="h-full rounded-full" :class="i.qty<=i.min?'bg-ro':'bg-em'" :style="`width:${Math.min(100,i.qty/Math.max(i.min*3,1)*100)}%`"></div></div>
+   <div class="mt-3 flex gap-2"><button class="btn-g flex-1 !py-1.5" @click="adj(i,i.unit==='pcs'?-10:-1)"><i data-lucide="minus" class="h-4 w-4"></i></button><button class="btn-g flex-1 !py-1.5" @click="adj(i,i.unit==='pcs'?10:1)"><i data-lucide="plus" class="h-4 w-4"></i></button></div>
+  </div></template>
+ </div>
+</section>
 
-        <!-- Sidebar Drawer with Full Menu -->
-        <div x-show="sidebarOpen" class="fixed inset-0 z-50 flex">
-            <div @click="sidebarOpen = false" class="fixed inset-0 bg-black/50 transition-opacity"></div>
-            <div class="relative w-72 bg-white dark:bg-cardBg h-full shadow-2xl flex flex-col z-10 p-5 space-y-4 overflow-y-auto">
-                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-4">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-2xl">🧁</span>
-                        <span class="font-bold text-xl">BakeFlow Menu</span>
-                    </div>
-                    <button @click="sidebarOpen = false" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
-                        <i data-lucide="x" class="w-6 h-6"></i>
-                    </button>
-                </div>
+<!-- Expenses -->
+<section x-show="tab==='expenses'" x-cloak class="tab space-y-6">
+ <div class="card p-5"><h2 class="mb-4 font-display text-xl font-semibold">Log an expense</h2>
+  <div class="grid gap-3 sm:grid-cols-4"><input class="inp sm:col-span-2" x-model="e.title" placeholder="What did you pay for?"><select class="inp" x-model="e.category"><template x-for="c in cats" :key="c"><option x-text="c"></option></template></select><input type="number" min="0" class="inp" x-model="e.amount" placeholder="Amount (৳)"></div>
+  <button class="btn-p mt-4" @click="addExp()"><i data-lucide="plus" class="h-4 w-4"></i>Save expense</button></div>
+ <div class="grid grid-cols-2 gap-4 lg:grid-cols-4"><template x-for="c in cats" :key="c"><div class="card p-4"><p class="text-sm text-gray-400" x-text="c"></p><p class="mt-1 font-display text-xl font-extrabold" x-text="fmt(expenses.filter(x=>x.category===c).reduce((a,x)=>a+x.amount,0))"></p></div></template></div>
+ <div class="card p-5"><div class="mb-3 flex items-center justify-between"><h2 class="font-display text-xl font-semibold">Expense history</h2><span class="font-semibold text-ro" x-text="fmt(spent)"></span></div>
+  <p x-show="!expenses.length" class="py-6 text-center text-sm text-gray-500">No expenses logged yet.</p>
+  <div class="divide-y divide-white/5"><template x-for="x in expenses" :key="x.id"><div class="flex items-center justify-between gap-3 py-3"><div><p class="font-semibold" x-text="x.title"></p><p class="text-xs text-gray-500" x-text="x.category+' · '+dfmt(x.day)"></p></div><div class="flex items-center gap-3"><span class="font-bold" x-text="fmt(x.amount)"></span><button class="text-gray-500 hover:text-ro" @click="expenses=expenses.filter(y=>y.id!==x.id)" title="Delete"><i data-lucide="trash-2" class="h-4 w-4"></i></button></div></div></template></div></div>
+</section>
 
-                <nav class="space-y-1.5 flex-1">
-                    <button @click="currentTab = 'dashboard'; sidebarOpen = false" :class="currentTab === 'dashboard' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                        <span>Dashboard</span>
-                    </button>
-                    <button @click="currentTab = 'orders'; sidebarOpen = false" :class="currentTab === 'orders' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                        <span>Orders & POS</span>
-                    </button>
-                    <button @click="currentTab = 'customers'; sidebarOpen = false" :class="currentTab === 'customers' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                        <i data-lucide="users" class="w-5 h-5"></i>
-                        <span>Customer History</span>
-                    </button>
-                    <button @click="currentTab = 'calendar'; sidebarOpen = false" :class="currentTab === 'calendar' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                        <i data-lucide="calendar" class="w-5 h-5"></i>
-                        <span>Delivery Calendar</span>
-                    </button>
-                    <button @click="currentTab = 'expenses'; sidebarOpen = false" :class="currentTab === 'expenses' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                        <i data-lucide="receipt" class="w-5 h-5"></i>
-                        <span>Expenses & Costs</span>
-                    </button>
-                    <button @click="currentTab = 'settings'; sidebarOpen = false" :class="currentTab === 'settings' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                        <i data-lucide="settings" class="w-5 h-5"></i>
-                        <span>Shop Settings</span>
-                    </button>
-                    <button @click="currentTab = 'backup'; sidebarOpen = false" :class="currentTab === 'backup' ? 'bg-primary text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition">
-                        <i data-lucide="database" class="w-5 h-5"></i>
-                        <span>Cloud Backup</span>
-                    </button>
-                </nav>
+<!-- Settings -->
+<section x-show="tab==='settings'" x-cloak class="tab max-w-3xl space-y-6">
+ <div class="card p-5 lg:p-6">
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 class="font-display text-xl font-semibold">Google Sheet sync</h2><span class="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold" :class="url?'bg-em/15 text-em':'bg-white/5 text-gray-400'"><i :data-lucide="url?'cloud':'cloud-off'" class="h-3.5 w-3.5"></i><span x-text="url?'Cloud Sync Connected':'Local Storage Only'"></span></span></div>
+  <label class="lbl">Google Apps Script Web App URL</label><input class="inp" x-model="urlIn" placeholder="https://script.google.com/macros/s/…/exec">
+  <p class="mt-2 text-xs text-gray-500">Each saved order or expense is posted to this URL as JSON. If you are offline, changes wait in a queue and send when you reconnect.</p>
+  <div class="mt-4 flex gap-3"><button class="btn-p" @click="saveUrl()">Save connection</button><button class="btn-g" x-show="url" @click="urlIn='';saveUrl()">Disconnect</button></div>
+ </div>
+ <div class="card p-5 lg:p-6">
+  <h2 class="mb-1 font-display text-xl font-semibold">Backup and restore</h2><p class="mb-4 text-sm text-gray-400">Download a copy of your data or restore one on a new device.</p>
+  <div class="flex flex-wrap gap-3"><button class="btn-g" @click="expJSON()"><i data-lucide="download" class="h-4 w-4"></i>Export JSON</button><button class="btn-g" @click="expCSV()"><i data-lucide="download" class="h-4 w-4"></i>Export orders CSV</button><label class="btn-g cursor-pointer"><i data-lucide="upload" class="h-4 w-4"></i>Import JSON<input type="file" accept=".json,application/json" class="hidden" @change="impJSON($event)"></label></div>
+ </div>
+</section>
+</main>
 
-                <div class="border-t border-slate-200 dark:border-slate-700 pt-3 text-xs text-center text-slate-500">
-                    BakeFlow Cloud Edition • Firebase
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content Area -->
-        <main class="max-w-6xl mx-auto p-4 md:p-6 pb-24 space-y-6">
-
-            <!-- 1. DASHBOARD TAB -->
-            <div x-show="currentTab === 'dashboard'" class="space-y-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-500">Total Orders</span>
-                            <i data-lucide="shopping-cart" class="w-5 h-5 text-primary"></i>
-                        </div>
-                        <h2 class="text-2xl font-bold mt-2" x-text="orders.length">0</h2>
-                    </div>
-                    <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-500">Total Sales</span>
-                            <i data-lucide="dollar-sign" class="w-5 h-5 text-emerald-500"></i>
-                        </div>
-                        <h2 class="text-2xl font-bold mt-2 text-emerald-500" x-text="'৳ ' + totalSales">0</h2>
-                    </div>
-                    <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-500">Estimated Profit</span>
-                            <i data-lucide="trending-up" class="w-5 h-5 text-amber-500"></i>
-                        </div>
-                        <h2 class="text-2xl font-bold mt-2 text-amber-500" x-text="'৳ ' + totalProfit">0</h2>
-                    </div>
-                    <div class="bg-white dark:bg-cardBg p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-slate-500">Due / Receivable</span>
-                            <i data-lucide="alert-circle" class="w-5 h-5 text-rose-500"></i>
-                        </div>
-                        <h2 class="text-2xl font-bold mt-2 text-rose-500" x-text="'৳ ' + totalDue">0</h2>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-bold">Quick New Order</h3>
-                        <p class="text-sm text-slate-500">Create a new cake order instantly and send WhatsApp invoice.</p>
-                    </div>
-                    <button @click="currentTab = 'orders'" class="px-5 py-3 bg-primary text-white font-medium rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition flex items-center space-x-2">
-                        <i data-lucide="plus" class="w-5 h-5"></i>
-                        <span>New Order Form</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- 2. ORDERS & POS TAB -->
-            <div x-show="currentTab === 'orders'" class="space-y-6">
-                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                    <h3 class="text-xl font-bold mb-4">Add New Order (Cloud Synced)</h3>
-                    <form @submit.prevent="addOrder" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Customer Name</label>
-                            <input type="text" x-model="newOrder.customerName" placeholder="Rahim Ahmed" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">WhatsApp Phone</label>
-                            <input type="text" x-model="newOrder.phone" placeholder="01813692433" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Cake Flavor & Weight</label>
-                            <input type="text" x-model="newOrder.item" placeholder="Chocolate 2 Pound" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Total Amount (৳)</label>
-                            <input type="number" x-model.number="newOrder.total" placeholder="1500" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Advance Paid (৳)</label>
-                            <input type="number" x-model.number="newOrder.advance" placeholder="500" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Delivery Date</label>
-                            <input type="date" x-model="newOrder.deliveryDate" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        </div>
-                        
-                        <div class="md:col-span-3 flex justify-end">
-                            <button type="submit" class="px-6 py-3 bg-primary text-white font-medium rounded-xl shadow-lg shadow-primary/30 hover:bg-primary/90 transition flex items-center space-x-2">
-                                <i data-lucide="cloud-upload" class="w-5 h-5"></i>
-                                <span>Save Order & Send WhatsApp</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Orders Table -->
-                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                    <h3 class="text-xl font-bold mb-4">All Cloud Orders</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="border-b border-slate-200 dark:border-slate-700 text-slate-400 text-sm">
-                                    <th class="py-3 px-4">Customer</th>
-                                    <th class="py-3 px-4">Cake Item</th>
-                                    <th class="py-3 px-4">Delivery Date</th>
-                                    <th class="py-3 px-4">Total</th>
-                                    <th class="py-3 px-4">Paid / Due</th>
-                                    <th class="py-3 px-4 text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <template x-for="order in orders" :key="order.id">
-                                    <tr class="border-b border-slate-100 dark:border-slate-800">
-                                        <td class="py-3 px-4">
-                                            <div class="font-medium" x-text="order.customerName"></div>
-                                            <div class="text-xs text-slate-500" x-text="order.phone"></div>
-                                        </td>
-                                        <td class="py-3 px-4" x-text="order.item"></td>
-                                        <td class="py-3 px-4 text-sm" x-text="order.deliveryDate"></td>
-                                        <td class="py-3 px-4 font-bold" x-text="'৳ ' + order.total"></td>
-                                        <td class="py-3 px-4 text-sm">
-                                            <span class="text-emerald-500" x-text="'Paid: ৳' + order.advance"></span><br>
-                                            <span class="text-rose-500" x-text="'Due: ৳' + (order.total - order.advance)"></span>
-                                        </td>
-                                        <td class="py-3 px-4 text-center space-x-1">
-                                            <button @click="sendWhatsApp(order)" class="p-2 text-emerald-500 hover:bg-emerald-50 rounded-lg" title="WhatsApp Invoice"><i data-lucide="message-circle" class="w-4 h-4"></i></button>
-                                            <button @click="deleteOrder(order.id)" class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg" title="Delete Order"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                                        </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. CUSTOMER HISTORY TAB -->
-            <div x-show="currentTab === 'customers'" class="space-y-6">
-                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                    <h3 class="text-xl font-bold mb-4">Customer Directory & History</h3>
-                    <div class="space-y-3">
-                        <template x-for="cust in uniqueCustomers" :key="cust.phone">
-                            <div class="p-4 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex justify-between items-center">
-                                <div>
-                                    <h4 class="font-bold text-base" x-text="cust.name"></h4>
-                                    <p class="text-xs text-slate-500" x-text="'Phone: ' + cust.phone"></p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-sm font-semibold text-primary" x-text="cust.ordersCount + ' Orders'"></span>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. DELIVERY CALENDAR TAB -->
-            <div x-show="currentTab === 'calendar'" class="space-y-6">
-                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-                    <h3 class="text-xl font-bold mb-4">Scheduled Deliveries</h3>
-                    <div class="space-y-3">
-                        <template x-for="order in orders" :key="order.id">
-                            <div class="p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                                <div>
-                                    <span class="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full font-bold" x-text="order.deliveryDate"></span>
-                                    <h4 class="font-bold mt-2" x-text="order.customerName + ' - ' + order.item"></h4>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-sm font-bold text-emerald-500" x-text="'৳ ' + order.total"></span>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 5. EXPENSES & COSTS TAB -->
-            <div x-show="currentTab === 'expenses'" class="space-y-6">
-                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
-                    <h3 class="text-xl font-bold">Add Business Expense</h3>
-                    <form @submit.prevent="addExpense" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <input type="text" x-model="newExpense.title" placeholder="Expense Title (e.g. Flour, Sugar)" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        <input type="number" x-model.number="newExpense.amount" placeholder="Amount (৳)" required class="px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        <button type="submit" class="px-5 py-2.5 bg-primary text-white font-medium rounded-xl">Add Expense</button>
-                    </form>
-
-                    <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
-                        <h4 class="font-bold mb-3">Expense Records</h4>
-                        <div class="space-y-2">
-                            <template x-for="exp in expenses" :key="exp.id">
-                                <div class="flex justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border dark:border-slate-800">
-                                    <span x-text="exp.title"></span>
-                                    <span class="font-bold text-rose-500" x-text="'- ৳ ' + exp.amount"></span>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 6. SHOP SETTINGS TAB -->
-            <div x-show="currentTab === 'settings'" class="space-y-6">
-                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
-                    <h3 class="text-xl font-bold">Shop Branding & Settings</h3>
-                    <form @submit.prevent="updateShopProfile" class="space-y-4 max-w-lg">
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Shop Name</label>
-                            <input type="text" x-model="shopProfile.shopName" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">WhatsApp Contact</label>
-                            <input type="text" x-model="shopProfile.phone" required class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Logo URL</label>
-                            <input type="text" x-model="shopProfile.logo" placeholder="https://..." class="w-full px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        </div>
-                        <button type="submit" class="px-5 py-2.5 bg-primary text-white font-medium rounded-xl">Save Settings to Cloud</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- 7. CLOUD BACKUP TAB -->
-            <div x-show="currentTab === 'backup'" class="space-y-6">
-                <div class="bg-white dark:bg-cardBg p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-4">
-                    <h3 class="text-xl font-bold">Cloud Backup & Restore</h3>
-                    <p class="text-sm text-slate-500">Your data is safely stored in Google Firebase Cloud associated with your email account. You can log in from any device anytime!</p>
-                    <div class="p-4 bg-emerald-500/10 text-emerald-500 rounded-xl font-medium text-sm">
-                        Status: Cloud Sync Active & Running (Lifetime Free Tier)
-                    </div>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <!-- APP LOGIC & FIREBASE -->
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDP9A4C78LP1VBJuVwdiotnzvMS_Lhnytk",
-            authDomain: "bakeflow-fc939.firebaseapp.com",
-            projectId: "bakeflow-fc939",
-            storageBucket: "bakeflow-fc939.firebasestorage.app",
-            messagingSenderId: "1034318320533",
-            appId: "1:1034318320533:web:3a7704c242490886b69c9c",
-            measurementId: "G-FDPX5SRGRP"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('bakeFlowCloud', () => ({
-                currentTab: 'dashboard',
-                sidebarOpen: false,
-                darkMode: true,
-                currentUser: null,
-                isSignUp: false,
-                isLoading: false,
-                authError: '',
-
-                authForm: { email: '', password: '', shopName: '' },
-                shopProfile: { shopName: 'BakeFlow Bakery', phone: '', logo: '' },
-                orders: [],
-                expenses: [],
-                newOrder: { customerName: '', phone: '', item: '', total: '', advance: '', deliveryDate: '' },
-                newExpense: { title: '', amount: '' },
-
-                init() {
-                    auth.onAuthStateChanged(user => {
-                        if (user) {
-                            this.currentUser = user;
-                            this.fetchCloudData();
-                        } else {
-                            this.currentUser = null;
-                        }
-                        setTimeout(() => lucide.createIcons(), 100);
-                    });
-                },
-
-                toggleDarkMode() { this.darkMode = !this.darkMode; },
-
-                async handleAuth() {
-                    this.isLoading = true;
-                    this.authError = '';
-                    try {
-                        if (this.isSignUp) {
-                            const res = await auth.createUserWithEmailAndPassword(this.authForm.email, this.authForm.password);
-                            await db.collection('users').doc(res.user.uid).set({
-                                shopName: this.authForm.shopName,
-                                email: this.authForm.email,
-                                phone: '',
-                                logo: ''
-                            });
-                        } else {
-                            await auth.signInWithEmailAndPassword(this.authForm.email, this.authForm.password);
-                        }
-                    } catch (err) {
-                        this.authError = err.message;
-                    } finally {
-                        this.isLoading = false;
-                    }
-                },
-
-                logout() { auth.signOut(); },
-
-                fetchCloudData() {
-                    if (!this.currentUser) return;
-
-                    db.collection('users').doc(this.currentUser.uid).onSnapshot(doc => {
-                        if (doc.exists) this.shopProfile = doc.data();
-                    });
-
-                    db.collection('users').doc(this.currentUser.uid).collection('orders')
-                      .orderBy('deliveryDate', 'desc')
-                      .onSnapshot(snapshot => {
-                          this.orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                          setTimeout(() => lucide.createIcons(), 50);
-                      });
-
-                    db.collection('users').doc(this.currentUser.uid).collection('expenses')
-                      .onSnapshot(snapshot => {
-                          this.expenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                      });
-                },
-
-                async addOrder() {
-                    if (!this.currentUser) return;
-                    await db.collection('users').doc(this.currentUser.uid).collection('orders').add({
-                        ...this.newOrder,
-                        createdAt: new Date().toISOString()
-                    });
-                    this.sendWhatsApp(this.newOrder);
-                    this.newOrder = { customerName: '', phone: '', item: '', total: '', advance: '', deliveryDate: '' };
-                    alert('Order synced to Cloud & WhatsApp ready!');
-                },
-
-                async deleteOrder(id) {
-                    if (confirm('Delete this order from Cloud?')) {
-                        await db.collection('users').doc(this.currentUser.uid).collection('orders').doc(id).delete();
-                    }
-                },
-
-                async addExpense() {
-                    if (!this.currentUser) return;
-                    await db.collection('users').doc(this.currentUser.uid).collection('expenses').add(this.newExpense);
-                    this.newExpense = { title: '', amount: '' };
-                },
-
-                async updateShopProfile() {
-                    await db.collection('users').doc(this.currentUser.uid).update(this.shopProfile);
-                    alert('Shop profile updated!');
-                },
-
-                sendWhatsApp(order) {
-                    const due = order.total - order.advance;
-                    const msg = `Hello *${order.customerName}*,\n\nThank you for ordering from *${this.shopProfile.shopName || 'BakeFlow'}*! 🎂\n\n*Order Details:*\n- Item: ${order.item}\n- Total: ৳${order.total}\n- Paid: ৳${order.advance}\n- Due: ৳${due}\n- Delivery Date: ${order.deliveryDate}`;
-                    window.open(`https://wa.me/88${order.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
-                },
-
-                get totalSales() { return this.orders.reduce((sum, o) => sum + Number(o.total || 0), 0); },
-                get totalDue() { return this.orders.reduce((sum, o) => sum + (Number(o.total || 0) - Number(o.advance || 0)), 0); },
-                get totalExpenses() { return this.expenses.reduce((sum, e) => sum + Number(e.amount || 0), 0); },
-                get totalProfit() { return (this.totalSales * 0.5) - this.totalExpenses; },
-
-                get uniqueCustomers() {
-                    const map = {};
-                    this.orders.forEach(o => {
-                        if (!map[o.phone]) {
-                            map[o.phone] = { name: o.customerName, phone: o.phone, ordersCount: 0 };
-                        }
-                        map[o.phone].ordersCount++;
-                    });
-                    return Object.values(map);
-                }
-            }));
-        });
-    </script>
+<div x-show="toast" x-cloak x-transition class="fixed bottom-5 right-5 z-[60] max-w-sm rounded-xl border px-4 py-3 text-sm font-medium shadow-2xl backdrop-blur-xl" :class="toast?.err?'border-ro/40 bg-ro/20 text-rose-100':'border-em/40 bg-em/20 text-emerald-100'" x-text="toast?.m"></div>
 </body>
 </html>
